@@ -6,10 +6,10 @@
 
 HINSTANCE hinst;
 
-BOOL InitializeBass()
+BOOL InitializeBass(HWND ParentWin)
 {
   BOOL success;
-  success = BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);
+  success = BASS_Init(-1, 48000, BASS_DEVICE_STEREO, ParentWin, NULL);
   if(success == TRUE)
   {
   }
@@ -19,13 +19,9 @@ BOOL InitializeBass()
 HSTREAM CreateSound(char *filename)
 {
   HSTREAM handle;
-  handle = BASS_StreamCreateFile(FALSE, filename, 0, 0, BASS_STREAM_AUTOFREE);
-  if(handle == 0)
-  {
-    DEBUG(L"error creating sound");
-    return 0;
-  }
-  BASS_ChannelPlay(handle, TRUE);
+  handle = BASS_StreamCreateFile(FALSE, filename, 0, 0, BASS_STREAM_AUTOFREE | BASS_SAMPLE_LOOP);
+  if(handle != 0)
+    BASS_ChannelPlay(handle, TRUE);
   return handle;
 }
 
@@ -34,18 +30,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
                        LPVOID lpReserved
            )
 {
-  BOOL success;
   switch (ul_reason_for_call)
   {
   case DLL_PROCESS_ATTACH:
-    success = InitializeBass();
-    if(!success)
-      return FALSE;
     hinst=(HINSTANCE)hModule;
     break;
   case DLL_PROCESS_DETACH:
-    BASS_Free();
-    break;
   case DLL_THREAD_ATTACH:
   case DLL_THREAD_DETACH:
     break;
@@ -74,6 +64,7 @@ void __stdcall ListCloseWindow(HWND ListWin)
   handle = (HSTREAM)GetWindowLongPtr(ListWin, GWLP_USERDATA);
   if(handle != 0)
     BASS_ChannelStop(handle);
+  BASS_Free();
   DestroyWindow(ListWin);
 }
 
@@ -91,9 +82,29 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
   if(!hwnd)
     return NULL;
 
+  InitializeBass(hwnd);
+
   handle = CreateSound(FileToLoad);
   if(handle == 0)
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)0);
+  {
+    BASS_Free();
+    DestroyWindow(hwnd);
+    return NULL;
+  }
   SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)handle);
   return hwnd;
+}
+
+int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int ShowFlags)
+{
+  HSTREAM handle;
+  handle = (HSTREAM)GetWindowLongPtr(ListWin, GWLP_USERDATA);
+  if(handle != 0)
+    BASS_ChannelStop(handle);
+  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)0);
+  handle = CreateSound(FileToLoad);
+  if(handle == 0)
+    return LISTPLUGIN_ERROR;
+  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)handle);
+  return LISTPLUGIN_OK;
 }
