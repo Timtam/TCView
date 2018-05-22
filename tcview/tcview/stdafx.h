@@ -8,7 +8,14 @@
 #define WIN32_LEAN_AND_MEAN             // Selten verwendete Komponenten aus Windows-Headern ausschlieﬂen
 // Windows-Headerdateien:
 #include <windows.h>
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <tchar.h>
+#include <algorithm>
+#include <string>
+#include <sstream>
+#include <iterator>
+#include <vector>
 
 
 // TODO: Hier auf zus‰tzliche Header, die das Programm erfordert, verweisen.
