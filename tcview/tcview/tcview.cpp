@@ -4,9 +4,16 @@
 #include "shlwapi.h"
 
 #define DEBUG(text) MessageBox(NULL, text, L"Debug", MB_OK)
+#define IDT_TIMER1 100
 
 HINSTANCE hinst;
+HWND Parent;
 char Extensions[MAX_PATH] = {"EXT=\"MP3\" | EXT=\"WAV\" | EXT=\"OGG\""};
+LONG_PTR DefWinProc;
+HSTREAM CurrentSound;
+
+// configuration
+BOOL Looping = FALSE;
 
 template<typename Out>
 void split(const char *s, char delim, Out result) {
@@ -45,11 +52,26 @@ void InitializeBass()
 
 HSTREAM CreateSound(char *filename)
 {
+  DWORD flags = BASS_STREAM_AUTOFREE;
   HSTREAM handle;
-  handle = BASS_StreamCreateFile(FALSE, filename, 0, 0, BASS_STREAM_AUTOFREE | BASS_SAMPLE_LOOP);
+  if(Looping)
+    flags &= BASS_SAMPLE_LOOP;
+  handle = BASS_StreamCreateFile(FALSE, filename, 0, 0, flags);
   if(handle != 0)
+  {
     BASS_ChannelPlay(handle, TRUE);
+    CurrentSound = handle;
+  }
   return handle;
+}
+
+void SwitchLooping()
+{
+  Looping = !Looping;
+  if(Looping)
+    BASS_ChannelFlags(CurrentSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
+  else
+    BASS_ChannelFlags(CurrentSound, 0, BASS_SAMPLE_LOOP);
 }
 
 void LoadPlugins()
@@ -91,6 +113,31 @@ void LoadPlugins()
     }
   }
   while(FindNextFile(hFind, &ffd) != 0);
+}
+
+LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+  if(msg == WM_KEYDOWN)
+  {
+    switch(wParam)
+    {
+      case 'L':
+        SwitchLooping();
+        return 0;
+    }
+  }
+  return CallWindowProc((WNDPROC)DefWinProc, hwnd, msg, wParam, lParam);
+}
+
+void CALLBACK ReplaceWindowProcTimer(HWND hwnd, UINT msg, UINT_PTR idEvent, DWORD dwTime)
+{
+  LONG_PTR winproc = GetWindowLongPtr(hwnd, GWLP_WNDPROC);
+  if(winproc != DefWinProc)
+  {
+    DefWinProc = winproc;
+    SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)WinProc);
+    KillTimer(hwnd, idEvent);
+  }
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -139,7 +186,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 
   GetClientRect(ParentWin,&r);
 
-  hwnd=CreateWindow(L"STATIC",0,WS_CHILD,
+  hwnd=CreateWindow(L"EDIT",0,WS_CHILD | WS_VISIBLE | ES_READONLY,
     r.left,r.top,r.right-r.left,
     r.bottom-r.top,ParentWin,NULL,hinst,NULL);
   if(!hwnd)
@@ -155,6 +202,12 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
     return NULL;
   }
   SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)handle);
+  Parent = ParentWin;
+  ShowWindow(hwnd, SW_SHOW);
+  SetFocus(hwnd);
+  UpdateWindow(hwnd);
+  DefWinProc = GetWindowLongPtr(hwnd, GWLP_WNDPROC);
+  SetTimer(hwnd, IDT_TIMER1, 50, (TIMERPROC)ReplaceWindowProcTimer);
   return hwnd;
 }
 
