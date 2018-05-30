@@ -2,6 +2,7 @@
 
 #include "bass.h"
 #include <string>
+#include <vector>
 
 class Sound
 {
@@ -15,6 +16,9 @@ class Sound
     void stop();
 };
 
-bool CanLoadAudio();
-void InitializeAudio();
-void ShutdownAudio();
+bool AudioCanLoad();
+std::vector<std::string> AudioGetExtensions();
+void AudioInitialize();
+void AudioLoadPlugins();
+void AudioShutdown();
+void AudioUnloadPlugins();

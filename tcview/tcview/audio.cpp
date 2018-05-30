@@ -1,5 +1,17 @@
 #include "stdafx.h"
 #include "audio.h"
+#include "tcview.h"
+
+std::vector<std::string> Extensions{"MP3", "OGG", "WAV"};
+
+// helper functions
+
+void __ParseExtensions(const char *exts)
+{
+  std::vector<std::string> lexts = string_split(exts, ';');
+  for(auto &i: lexts)
+    Extensions.push_back(i.substr(2));
+}
 
 Sound::Sound(std::string filename)
 {
@@ -28,18 +40,63 @@ void Sound::stop()
   BASS_ChannelStop(this->sound);
 }
 
-void InitializeAudio()
+void AudioInitialize()
 {
   BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);
 }
 
-void ShutdownAudio()
+void AudioShutdown()
 {
   BASS_Free();
+}
+
+bool AudioCanLoad()
+{
+  return HIWORD(BASS_GetVersion()) == BASSVERSION;
+}
+
+std::vector<std::string> AudioGetExtensions()
+{
+  return Extensions;
+}
+
+void AudioUnloadPlugins()
+{
   BASS_PluginFree(0);
 }
 
-bool CanLoadAudio()
+void AudioLoadPlugins()
 {
-  return HIWORD(BASS_GetVersion()) == BASSVERSION;
+  BASS_PLUGININFO *hPluginInfo;
+  HPLUGIN hPlugin;
+  HANDLE hFind = INVALID_HANDLE_VALUE;
+  unsigned int i;
+  std::string currentdir = GetModuleDirectory();
+  std::string fullpath{0};
+  std::string searchpattern{0};
+  WIN32_FIND_DATAA ffd;
+  // append the wildcards
+  searchpattern = currentdir + "\\plugins\\*.dll";
+
+  // searching all plugin files
+  hFind = FindFirstFileA(searchpattern.c_str(), &ffd);
+  if(hFind == INVALID_HANDLE_VALUE)
+    return;
+
+  do
+  {
+    if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+      continue;
+    else
+    {
+      fullpath = currentdir + "\\plugins\\" + ffd.cFileName;
+      hPlugin = BASS_PluginLoad(fullpath.c_str(), 0);
+      if(!hPlugin)
+        continue;
+      hPluginInfo = (BASS_PLUGININFO*)BASS_PluginGetInfo(hPlugin);
+      for(i=0;i<hPluginInfo->formatc;i++)
+        __ParseExtensions(hPluginInfo->formats[i].exts);
+    }
+  }
+  while(FindNextFileA(hFind, &ffd) != 0);
 }

@@ -3,13 +3,16 @@
 #include "listplug.h"
 #include "shlwapi.h"
 #include "audio.h"
+#include "tcview.h"
 
-#define DEBUG(text) MessageBox(NULL, text, L"Debug", MB_OK)
+#include <algorithm>
+#include <iterator>
+#include <sstream>
+
 #define IDT_TIMER1 100
 
 HINSTANCE hinst;
 HWND Parent;
-char Extensions[MAX_PATH] = {"EXT=\"MP3\" | EXT=\"WAV\" | EXT=\"OGG\""};
 LONG_PTR DefWinProc;
 unsigned int WindowCount = 0;
 
@@ -17,9 +20,8 @@ unsigned int WindowCount = 0;
 BOOL Looping = FALSE;
 
 template<typename Out>
-void split(const char *s, char delim, Out result) {
-  std::string os;
-  os.assign(s, s+strlen(s)+1);
+void string_split(const char *s, char delim, Out result) {
+  std::string os{s};
   std::stringstream ss(os);
   std::string item;
   while (std::getline(ss, item, delim)) {
@@ -27,23 +29,10 @@ void split(const char *s, char delim, Out result) {
   }
 }
 
-std::vector<std::string> split(const char *s, char delim) {
+std::vector<std::string> string_split(const char *s, char delim) {
   std::vector<std::string> elems;
-  split(s, delim, std::back_inserter(elems));
+  string_split(s, delim, std::back_inserter(elems));
   return elems;
-}
-
-void ParseExtensions(const char *exts)
-{
-  std::vector<std::string> lexts = split(exts, ';');
-  unsigned int i;
-  char tmp[MAX_PATH];
-  for(i=0;i<lexts.size();i++)
-  {
-    std::transform(lexts[i].begin(), lexts[i].end(),lexts[i].begin(), ::toupper);
-    sprintf(tmp, "%s | EXT=\"%s\"", Extensions, lexts[i].c_str()+2);
-    sprintf(Extensions, "%s", tmp);
-  }
 }
 
 /*
@@ -56,47 +45,6 @@ void SwitchLooping()
     BASS_ChannelFlags(CurrentSound, 0, BASS_SAMPLE_LOOP);
 }
 */
-
-void LoadPlugins()
-{
-  BASS_PLUGININFO *hPluginInfo;
-  char pluginfile[MAX_PATH] = {0};
-  HPLUGIN hPlugin;
-  HANDLE hFind = INVALID_HANDLE_VALUE;
-  unsigned int i;
-  wchar_t currentdir[MAX_PATH] = {0};
-  wchar_t fullpath[MAX_PATH] = {0};
-  wchar_t searchpattern[MAX_PATH] = {0};
-  WIN32_FIND_DATA ffd;
-  // we'll get the dll directory first
-  GetModuleFileNameW(hinst, currentdir, _countof(currentdir));
-  PathRemoveFileSpec(currentdir);
-  // append the wildcards
-  swprintf(searchpattern, MAX_PATH, L"%s\\plugins\\*.dll", currentdir);
-
-  // searching all plugin files
-  hFind = FindFirstFile(searchpattern, &ffd);
-  if(hFind == INVALID_HANDLE_VALUE)
-    return;
-
-  do
-  {
-    if(ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-      continue;
-    else
-    {
-      swprintf(fullpath, MAX_PATH, L"%s\\plugins\\%s", currentdir, ffd.cFileName);
-      wcstombs(pluginfile, fullpath, MAX_PATH);
-      hPlugin = BASS_PluginLoad(pluginfile, 0);
-      if(!hPlugin)
-        continue;
-      hPluginInfo = (BASS_PLUGININFO*)BASS_PluginGetInfo(hPlugin);
-      for(i=0;i<hPluginInfo->formatc;i++)
-        ParseExtensions(hPluginInfo->formats[i].exts);
-    }
-  }
-  while(FindNextFile(hFind, &ffd) != 0);
-}
 
 LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -123,6 +71,14 @@ void CALLBACK ReplaceWindowProcTimer(HWND hwnd, UINT msg, UINT_PTR idEvent, DWOR
   }
 }
 
+std::string GetModuleDirectory()
+{
+  char currentdir[MAX_PATH];
+  GetModuleFileNameA(hinst, currentdir, _countof(currentdir));
+  PathRemoveFileSpecA(currentdir);
+  return std::string{currentdir};
+}
+
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -131,12 +87,14 @@ BOOL APIENTRY DllMain( HMODULE hModule,
   switch (ul_reason_for_call)
   {
   case DLL_PROCESS_ATTACH:
-    if(CanLoadAudio() == false)
+    if(AudioCanLoad() == false)
       return FALSE;
     hinst=(HINSTANCE)hModule;
-    LoadPlugins();
+    AudioLoadPlugins();
     break;
   case DLL_PROCESS_DETACH:
+    AudioUnloadPlugins();
+    break;
   case DLL_THREAD_ATTACH:
   case DLL_THREAD_DETACH:
     break;
@@ -146,7 +104,26 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 void __stdcall ListGetDetectString(char *detectstring, int maxlen)
 {
-  sprintf(detectstring, "MULTIMEDIA & (%s)", Extensions);
+  std::vector<std::string> exts = AudioGetExtensions();
+  std::string detect{"MULTIMEDIA & ("};
+  unsigned int size;
+  unsigned int i;
+  if(exts.size() == 0)
+    return;
+  for(i = 0; i < exts.size(); i++)
+  {
+    std::transform(exts[i].begin(), exts[i].end(),exts[i].begin(), ::toupper);
+    detect += "EXT=\"" + exts[i] + "\" | ";
+  }
+  detect.erase(detect.length()-3, detect.length());
+  detect += ")";
+  if(detect.size() > maxlen)
+    return;
+  size = maxlen - 1;
+  if(detect.length() < size)
+    size = detect.length();
+  detect.copy(detectstring, size);
+  detectstring[size + 1] = '\0';
 }
 
 void __stdcall ListCloseWindow(HWND ListWin)
@@ -160,7 +137,7 @@ void __stdcall ListCloseWindow(HWND ListWin)
   }
   WindowCount--;
   if(WindowCount == 0)
-    ShutdownAudio();
+    AudioShutdown();
   DestroyWindow(ListWin);
 }
 
@@ -181,7 +158,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
   WindowCount++;
 
   if(WindowCount == 1)
-    InitializeAudio();
+    AudioInitialize();
 
   try
   {
@@ -193,7 +170,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
     DestroyWindow(hwnd);
     WindowCount--;
     if(WindowCount == 0)
-      ShutdownAudio();
+      AudioShutdown();
     return NULL;
   }
   SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)sound);
