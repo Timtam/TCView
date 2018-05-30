@@ -2,6 +2,7 @@
 #include "bass.h"
 #include "listplug.h"
 #include "shlwapi.h"
+#include "audio.h"
 
 #define DEBUG(text) MessageBox(NULL, text, L"Debug", MB_OK)
 #define IDT_TIMER1 100
@@ -10,7 +11,6 @@ HINSTANCE hinst;
 HWND Parent;
 char Extensions[MAX_PATH] = {"EXT=\"MP3\" | EXT=\"WAV\" | EXT=\"OGG\""};
 LONG_PTR DefWinProc;
-HSTREAM CurrentSound;
 
 // configuration
 BOOL Looping = FALSE;
@@ -45,26 +45,7 @@ void ParseExtensions(const char *exts)
   }
 }
 
-void InitializeBass()
-{
-  BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);
-}
-
-HSTREAM CreateSound(char *filename)
-{
-  DWORD flags = BASS_STREAM_AUTOFREE;
-  HSTREAM handle;
-  if(Looping)
-    flags &= BASS_SAMPLE_LOOP;
-  handle = BASS_StreamCreateFile(FALSE, filename, 0, 0, flags);
-  if(handle != 0)
-  {
-    BASS_ChannelPlay(handle, TRUE);
-    CurrentSound = handle;
-  }
-  return handle;
-}
-
+/*
 void SwitchLooping()
 {
   Looping = !Looping;
@@ -73,6 +54,7 @@ void SwitchLooping()
   else
     BASS_ChannelFlags(CurrentSound, 0, BASS_SAMPLE_LOOP);
 }
+*/
 
 void LoadPlugins()
 {
@@ -122,7 +104,7 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch(wParam)
     {
       case 'L':
-        SwitchLooping();
+        //SwitchLooping();
         return 0;
     }
   }
@@ -170,19 +152,19 @@ void __stdcall ListGetDetectString(char *detectstring, int maxlen)
 
 void __stdcall ListCloseWindow(HWND ListWin)
 {
-  HSTREAM handle;
-  handle = (HSTREAM)GetWindowLongPtr(ListWin, GWLP_USERDATA);
-  if(handle != 0)
-    BASS_ChannelStop(handle);
+  Sound *sound;
+  sound = (Sound*)GetWindowLongPtr(ListWin, GWLP_USERDATA);
+  if(sound != 0)
+    sound->stop();
   BASS_Free();
   DestroyWindow(ListWin);
 }
 
 HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 {
-  HSTREAM handle;
   HWND hwnd;
   RECT r;
+  Sound sound;
 
   GetClientRect(ParentWin,&r);
 
@@ -192,16 +174,19 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
   if(!hwnd)
     return NULL;
 
-  InitializeBass();
+  InitializeAudio();
 
-  handle = CreateSound(FileToLoad);
+  sound.load(std::string(FileToLoad));
+  // TODO: exception on sound loading error
+  /*
   if(handle == 0)
   {
     BASS_Free();
     DestroyWindow(hwnd);
     return NULL;
   }
-  SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)handle);
+  */
+  SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)&sound);
   Parent = ParentWin;
   ShowWindow(hwnd, SW_SHOW);
   SetFocus(hwnd);
@@ -213,14 +198,18 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 
 int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int ShowFlags)
 {
-  HSTREAM handle;
-  handle = (HSTREAM)GetWindowLongPtr(ListWin, GWLP_USERDATA);
-  if(handle != 0)
-    BASS_ChannelSlideAttribute(handle, BASS_ATTRIB_VOL | BASS_SLIDE_LOG, -1, 200);
-  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)0);
-  handle = CreateSound(FileToLoad);
+  Sound *oldsnd;
+  Sound newsnd;
+  oldsnd = (Sound*)GetWindowLongPtr(ListWin, GWLP_USERDATA);
+  if(oldsnd != NULL)
+    oldsnd->fade_out();
+  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)NULL);
+  newsnd.load(std::string(FileToLoad));
+  // TODO: exception on sound loading error
+  /*
   if(handle == 0)
     return LISTPLUGIN_ERROR;
-  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)handle);
+  */
+  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)&newsnd);
   return LISTPLUGIN_OK;
 }
