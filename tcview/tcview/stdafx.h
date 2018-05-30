@@ -16,6 +16,7 @@
 #include <sstream>
 #include <iterator>
 #include <vector>
+#include <stdexcept>
 
 
 // TODO: Hier auf zusätzliche Header, die das Programm erfordert, verweisen.

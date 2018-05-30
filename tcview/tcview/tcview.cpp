@@ -11,6 +11,7 @@ HINSTANCE hinst;
 HWND Parent;
 char Extensions[MAX_PATH] = {"EXT=\"MP3\" | EXT=\"WAV\" | EXT=\"OGG\""};
 LONG_PTR DefWinProc;
+unsigned int WindowCount = 0;
 
 // configuration
 BOOL Looping = FALSE;
@@ -130,14 +131,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
   switch (ul_reason_for_call)
   {
   case DLL_PROCESS_ATTACH:
-    if(HIWORD(BASS_GetVersion()) != BASSVERSION)
+    if(CanLoadAudio() == false)
       return FALSE;
     hinst=(HINSTANCE)hModule;
     LoadPlugins();
     break;
   case DLL_PROCESS_DETACH:
-    BASS_PluginFree(0);
-    break;
   case DLL_THREAD_ATTACH:
   case DLL_THREAD_DETACH:
     break;
@@ -154,9 +153,14 @@ void __stdcall ListCloseWindow(HWND ListWin)
 {
   Sound *sound;
   sound = (Sound*)GetWindowLongPtr(ListWin, GWLP_USERDATA);
-  if(sound != 0)
+  if(sound != NULL)
+  {
     sound->stop();
-  BASS_Free();
+    delete sound;
+  }
+  WindowCount--;
+  if(WindowCount == 0)
+    ShutdownAudio();
   DestroyWindow(ListWin);
 }
 
@@ -164,7 +168,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 {
   HWND hwnd;
   RECT r;
-  Sound sound;
+  Sound *sound;
 
   GetClientRect(ParentWin,&r);
 
@@ -174,19 +178,25 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
   if(!hwnd)
     return NULL;
 
-  InitializeAudio();
+  WindowCount++;
 
-  sound.load(std::string(FileToLoad));
-  // TODO: exception on sound loading error
-  /*
-  if(handle == 0)
+  if(WindowCount == 1)
+    InitializeAudio();
+
+  try
   {
-    BASS_Free();
+    sound = new Sound{std::string{FileToLoad}};
+    sound->play();
+  }
+  catch (const std::invalid_argument& e)
+  {
     DestroyWindow(hwnd);
+    WindowCount--;
+    if(WindowCount == 0)
+      ShutdownAudio();
     return NULL;
   }
-  */
-  SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)&sound);
+  SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)sound);
   Parent = ParentWin;
   ShowWindow(hwnd, SW_SHOW);
   SetFocus(hwnd);
@@ -198,18 +208,23 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 
 int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int ShowFlags)
 {
-  Sound *oldsnd;
-  Sound newsnd;
-  oldsnd = (Sound*)GetWindowLongPtr(ListWin, GWLP_USERDATA);
-  if(oldsnd != NULL)
-    oldsnd->fade_out();
+  Sound *sound;
+  sound = (Sound*)GetWindowLongPtr(ListWin, GWLP_USERDATA);
+  if(sound != NULL)
+  {
+    sound->fade_out();
+    delete sound;
+  }
   SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)NULL);
-  newsnd.load(std::string(FileToLoad));
-  // TODO: exception on sound loading error
-  /*
-  if(handle == 0)
+  try
+  {
+    sound = new Sound{std::string{FileToLoad}};
+    sound->play();
+  }
+  catch (const std::invalid_argument& e)
+  {
     return LISTPLUGIN_ERROR;
-  */
-  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)&newsnd);
+  }
+  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)sound);
   return LISTPLUGIN_OK;
 }
