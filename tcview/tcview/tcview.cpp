@@ -5,6 +5,7 @@
 #include "audio.h"
 #include "tcview.h"
 #include "window.h"
+#include "config.h"
 #include <stdlib.h>
 
 #include <algorithm>
@@ -132,6 +133,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
   try
   {
     sound = new Sound{std::string{FileToLoad}};
+    sound->set_looping(Configuration::instance()->looping);
     sound->play();
     WindowSetSound(res.first, sound);
   }
@@ -161,6 +163,7 @@ int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int S
   try
   {
     sound = new Sound{std::string{FileToLoad}};
+    sound->set_looping(Configuration::instance()->looping);
     sound->play();
   }
   catch (const std::invalid_argument& e)
@@ -176,6 +179,7 @@ void __stdcall ListSetDefaultParams(ListDefaultParamStruct *dps)
   std::string ini{dps->DefaultIniName};
   PathRemoveFileSpecA(&ini.front() );
   ini.resize( strlen(ini.data() ));
+  ini += "\\tcview.ini";
   ini.shrink_to_fit();
-  // TODO: hand new path over to configuration
+  Configuration::instance()->set_file(ini);
 }

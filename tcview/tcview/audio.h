@@ -14,6 +14,7 @@ class Sound
     void load(std::string filename);
     void play();
     void stop();
+    void set_looping(bool looping);
 };
 
 bool AudioCanLoad();

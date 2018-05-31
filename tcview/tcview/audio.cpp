@@ -40,6 +40,14 @@ void Sound::stop()
   BASS_ChannelStop(this->sound);
 }
 
+void Sound::set_looping(bool looping)
+{
+  if(looping)
+    BASS_ChannelFlags(this->sound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
+  else
+    BASS_ChannelFlags(this->sound, 0, BASS_SAMPLE_LOOP);
+}
+
 void AudioInitialize()
 {
   BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);
