@@ -5,6 +5,7 @@
 #include "audio.h"
 #include "tcview.h"
 #include "window.h"
+#include <stdlib.h>
 
 #include <algorithm>
 #include <iterator>
@@ -168,4 +169,13 @@ int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int S
   }
   WindowSetSound(ListWin, sound);
   return LISTPLUGIN_OK;
+}
+
+void __stdcall ListSetDefaultParams(ListDefaultParamStruct *dps)
+{
+  std::string ini{dps->DefaultIniName};
+  PathRemoveFileSpecA(&ini.front() );
+  ini.resize( strlen(ini.data() ));
+  ini.shrink_to_fit();
+  // TODO: hand new path over to configuration
 }

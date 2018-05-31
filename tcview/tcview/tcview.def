@@ -3,3 +3,4 @@ EXPORTS
   ListCloseWindow
   ListGetDetectString
   ListLoadNext
+  ListSetDefaultParams
