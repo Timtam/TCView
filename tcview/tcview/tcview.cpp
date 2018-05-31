@@ -4,17 +4,13 @@
 #include "shlwapi.h"
 #include "audio.h"
 #include "tcview.h"
+#include "window.h"
 
 #include <algorithm>
 #include <iterator>
 #include <sstream>
 
-#define IDT_TIMER1 100
-
 HINSTANCE hinst;
-HWND Parent;
-LONG_PTR DefWinProc;
-unsigned int WindowCount = 0;
 
 // configuration
 BOOL Looping = FALSE;
@@ -45,31 +41,6 @@ void SwitchLooping()
     BASS_ChannelFlags(CurrentSound, 0, BASS_SAMPLE_LOOP);
 }
 */
-
-LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-  if(msg == WM_KEYDOWN)
-  {
-    switch(wParam)
-    {
-      case 'L':
-        //SwitchLooping();
-        return 0;
-    }
-  }
-  return CallWindowProc((WNDPROC)DefWinProc, hwnd, msg, wParam, lParam);
-}
-
-void CALLBACK ReplaceWindowProcTimer(HWND hwnd, UINT msg, UINT_PTR idEvent, DWORD dwTime)
-{
-  LONG_PTR winproc = GetWindowLongPtr(hwnd, GWLP_WNDPROC);
-  if(winproc != DefWinProc)
-  {
-    DefWinProc = winproc;
-    SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)WinProc);
-    KillTimer(hwnd, idEvent);
-  }
-}
 
 std::string GetModuleDirectory()
 {
@@ -128,71 +99,64 @@ void __stdcall ListGetDetectString(char *detectstring, int maxlen)
 
 void __stdcall ListCloseWindow(HWND ListWin)
 {
-  Sound *sound;
-  sound = (Sound*)GetWindowLongPtr(ListWin, GWLP_USERDATA);
+  int cnt;
+  Sound *sound = WindowGetSound(ListWin);
   if(sound != NULL)
   {
     sound->stop();
     delete sound;
+    WindowSetSound(ListWin, (Sound*)NULL);
   }
-  WindowCount--;
-  if(WindowCount == 0)
+  cnt = WindowDestroy(ListWin);
+  if(cnt == 0)
     AudioShutdown();
-  DestroyWindow(ListWin);
 }
 
 HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 {
-  HWND hwnd;
-  RECT r;
+  int cnt;
+  std::pair<HWND, int> res;
   Sound *sound;
 
-  GetClientRect(ParentWin,&r);
+  res = WindowCreateChild(ParentWin, hinst);
 
-  hwnd=CreateWindow(L"EDIT",0,WS_CHILD | WS_VISIBLE | ES_READONLY,
-    r.left,r.top,r.right-r.left,
-    r.bottom-r.top,ParentWin,NULL,hinst,NULL);
-  if(!hwnd)
+  if(res.first == NULL)
+  {
     return NULL;
+  }
 
-  WindowCount++;
-
-  if(WindowCount == 1)
+  if(res.second == 1)
     AudioInitialize();
 
   try
   {
     sound = new Sound{std::string{FileToLoad}};
     sound->play();
+    WindowSetSound(res.first, sound);
   }
   catch (const std::invalid_argument& e)
   {
-    DestroyWindow(hwnd);
-    WindowCount--;
-    if(WindowCount == 0)
+    cnt = WindowDestroy(res.first);
+    if(cnt == 0)
       AudioShutdown();
     return NULL;
   }
-  SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)sound);
-  Parent = ParentWin;
-  ShowWindow(hwnd, SW_SHOW);
-  SetFocus(hwnd);
-  UpdateWindow(hwnd);
-  DefWinProc = GetWindowLongPtr(hwnd, GWLP_WNDPROC);
-  SetTimer(hwnd, IDT_TIMER1, 50, (TIMERPROC)ReplaceWindowProcTimer);
-  return hwnd;
+
+  WindowShow(res.first);
+
+  return res.first;
 }
 
 int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int ShowFlags)
 {
   Sound *sound;
-  sound = (Sound*)GetWindowLongPtr(ListWin, GWLP_USERDATA);
+  sound = WindowGetSound(ListWin);
   if(sound != NULL)
   {
     sound->fade_out();
     delete sound;
   }
-  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)NULL);
+  WindowSetSound(ListWin, (Sound*)NULL);
   try
   {
     sound = new Sound{std::string{FileToLoad}};
@@ -202,6 +166,6 @@ int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int S
   {
     return LISTPLUGIN_ERROR;
   }
-  SetWindowLongPtr(ListWin, GWLP_USERDATA, (LONG_PTR)sound);
+  WindowSetSound(ListWin, sound);
   return LISTPLUGIN_OK;
 }
