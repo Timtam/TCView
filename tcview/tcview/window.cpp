@@ -133,6 +133,8 @@ void CALLBACK UpdateWindowTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTi
   {
     SetWindowLongPtr(win, GWLP_WNDPROC, DefWinProc);
     DefWinProc = NULL;
+    WindowSetSound(win, (Sound*)NULL);
+    delete sound;
     PostMessage(GetParent(win), WM_COMMAND, MAKELONG(NULL, itm_next), (LPARAM)win);
   }
 }
