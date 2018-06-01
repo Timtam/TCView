@@ -14,9 +14,6 @@
 
 HINSTANCE hinst;
 
-// configuration
-BOOL Looping = FALSE;
-
 template<typename Out>
 void string_split(const char *s, char delim, Out result) {
   std::string os{s};
@@ -32,17 +29,6 @@ std::vector<std::string> string_split(const char *s, char delim) {
   string_split(s, delim, std::back_inserter(elems));
   return elems;
 }
-
-/*
-void SwitchLooping()
-{
-  Looping = !Looping;
-  if(Looping)
-    BASS_ChannelFlags(CurrentSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP);
-  else
-    BASS_ChannelFlags(CurrentSound, 0, BASS_SAMPLE_LOOP);
-}
-*/
 
 std::string GetModuleDirectory()
 {
@@ -171,6 +157,7 @@ int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int S
     return LISTPLUGIN_ERROR;
   }
   WindowSetSound(ListWin, sound);
+  WindowShow(ListWin);
   return LISTPLUGIN_OK;
 }
 

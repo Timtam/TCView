@@ -1,11 +1,21 @@
 #include "stdafx.h"
 #include "audio.h"
+#include "config.h"
 #include "window.h"
 
 #define IDT_TIMER1 100
 
 LONG_PTR DefWinProc;
 unsigned int WindowCount = 0;
+
+void toggle_looping(HWND win)
+{
+  Sound *sound;
+  Configuration::instance()->looping = !Configuration::instance()->looping;
+  sound = WindowGetSound(win);
+  if(sound != NULL)
+    sound->set_looping(Configuration::instance()->looping);
+}
 
 LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -14,7 +24,7 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch(wParam)
     {
       case 'L':
-        //SwitchLooping();
+        toggle_looping(hwnd);
         return 0;
     }
   }
