@@ -63,6 +63,26 @@ void skip_backward(Sound *snd)
   snd->set_position(t);
 }
 
+void volume_up(Sound *snd)
+{
+  Configuration::instance()->volume = Configuration::instance()->volume + 0.05;
+  if(Configuration::instance()->volume > 1.0)
+    Configuration::instance()->volume = 1.0;
+  if(snd == NULL)
+    return;
+  snd->set_volume(Configuration::instance()->volume);
+}
+
+void volume_down(Sound *snd)
+{
+  Configuration::instance()->volume = Configuration::instance()->volume - .05;
+  if(Configuration::instance()->volume < 0)
+    Configuration::instance()->volume = .0;
+  if(snd == NULL)
+    return;
+  snd->set_volume(Configuration::instance()->volume);
+}
+
 void WindowUpdateText(HWND win)
 {
   double pos, len;
@@ -134,6 +154,12 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
       case VK_RIGHT:
         skip_forward(WindowGetSound(hwnd));
+        return 0;
+      case VK_UP:
+        volume_up(WindowGetSound(hwnd));
+        return 0;
+      case VK_DOWN:
+        volume_down(WindowGetSound(hwnd));
         return 0;
     }
   }

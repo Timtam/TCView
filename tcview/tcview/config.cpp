@@ -20,6 +20,7 @@ Configuration::Configuration()
 {
   this->register_property(&(this->continuous));
   this->register_property(&(this->looping));
+  this->register_property(&(this->volume));
 }
 
 Configuration * Configuration::instance()

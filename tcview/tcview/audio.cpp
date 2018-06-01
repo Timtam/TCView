@@ -88,6 +88,18 @@ void Sound::set_position(double pos)
   BASS_ChannelSetPosition(this->sound, BASS_ChannelSeconds2Bytes(this->sound, pos), BASS_POS_BYTE);
 }
 
+float Sound::get_volume()
+{
+  float f;
+  BASS_ChannelGetAttribute(this->sound, BASS_ATTRIB_VOL, &f);
+  return f;
+}
+
+void Sound::set_volume(float vol)
+{
+  BASS_ChannelSetAttribute(this->sound, BASS_ATTRIB_VOL, vol);
+}
+
 void AudioInitialize()
 {
   BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);

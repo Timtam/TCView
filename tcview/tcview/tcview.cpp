@@ -120,6 +120,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
   {
     sound = new Sound{std::string{FileToLoad}};
     sound->set_looping(Configuration::instance()->looping);
+    sound->set_volume(Configuration::instance()->volume);
     sound->play();
     WindowSetSound(res.first, sound);
   }
@@ -150,6 +151,7 @@ int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int S
   {
     sound = new Sound{std::string{FileToLoad}};
     sound->set_looping(Configuration::instance()->looping);
+    sound->set_volume(Configuration::instance()->volume);
     sound->play();
   }
   catch (const std::invalid_argument& e)

@@ -40,6 +40,7 @@ class Configuration
   public:
     Property<bool> continuous{"playback", "continuous", true};
     Property<bool> looping{"playback", "looping", true};
+    Property<float> volume{"playback", "volume", 1.0};
     static Configuration * instance();
     void set_file(std::string filename);
   private:

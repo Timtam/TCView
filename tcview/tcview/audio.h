@@ -22,6 +22,8 @@ class Sound
     void set_position(double pos);
     double get_position();
     double get_length();
+    float get_volume();
+    void set_volume(float vol);
 };
 
 bool AudioCanLoad();
