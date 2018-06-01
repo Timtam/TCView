@@ -58,6 +58,21 @@ std::string Sound::get_filename()
   return std::string{info.filename};
 }
 
+bool Sound::is_playing()
+{
+  return BASS_ChannelIsActive(this->sound) == BASS_ACTIVE_PLAYING;
+}
+
+bool Sound::is_paused()
+{
+  return BASS_ChannelIsActive(this->sound) == BASS_ACTIVE_PAUSED;
+}
+
+bool Sound::is_stopped()
+{
+  return BASS_ChannelIsActive(this->sound) == BASS_ACTIVE_STOPPED;
+}
+
 void AudioInitialize()
 {
   BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);

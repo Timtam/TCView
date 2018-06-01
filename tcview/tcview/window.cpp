@@ -1,15 +1,18 @@
 #include "stdafx.h"
 #include "audio.h"
 #include "config.h"
+#include "listplug.h"
 #include "window.h"
 
 #include <stdlib.h>
+#include <time.h>
 
 #define IDT_TIMER1 100
 #define IDT_TIMER2 200
 
 LONG_PTR DefWinProc;
 unsigned int WindowCount = 0;
+time_t TextUpdateTime = 0;
 
 void toggle_looping(HWND win)
 {
@@ -48,12 +51,26 @@ void WindowUpdateText(HWND win)
   }
   if(Configuration::instance()->looping)
     text += " (looping)";
+  if(Configuration::instance()->continuous)
+    text += " (continuous playback)";
   SetWindowTextA(win, text.c_str());
 }
 
-void CALLBACK UpdateWindowTextTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTime)
+void CALLBACK UpdateWindowTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTime)
 {
-  WindowUpdateText(win);
+  Sound *sound;
+  if(time(NULL) - TextUpdateTime >= 1)
+  {
+    WindowUpdateText(win);
+    TextUpdateTime = time(NULL);
+  }
+  sound = WindowGetSound(win);
+  if(sound != NULL && sound->is_stopped())
+  {
+    SetWindowLongPtr(win, GWLP_WNDPROC, DefWinProc);
+    DefWinProc = NULL;
+    PostMessage(GetParent(win), WM_COMMAND, MAKELONG(NULL, itm_next), (LPARAM)win);
+  }
 }
 
 LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -65,9 +82,14 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
       case 'L':
         toggle_looping(hwnd);
         return 0;
+      case 'C':
+        Configuration::instance()->continuous = !Configuration::instance()->continuous;
+        return 0;
     }
   }
-  return CallWindowProc((WNDPROC)DefWinProc, hwnd, msg, wParam, lParam);
+  if(DefWinProc != NULL)
+    return CallWindowProc((WNDPROC)DefWinProc, hwnd, msg, wParam, lParam);
+  return 0;
 }
 
 void CALLBACK ReplaceWindowProcTimer(HWND hwnd, UINT msg, UINT_PTR idEvent, DWORD dwTime)
@@ -123,6 +145,5 @@ void WindowShow(HWND win)
   ShowWindow(win, SW_SHOW);
   DefWinProc = GetWindowLongPtr(win, GWLP_WNDPROC);
   SetTimer(win, IDT_TIMER1, 50, (TIMERPROC)ReplaceWindowProcTimer);
-  SetTimer(win, IDT_TIMER2, 1000, (TIMERPROC)UpdateWindowTextTimer);
-  WindowUpdateText(win);
+  SetTimer(win, IDT_TIMER2, 20, (TIMERPROC)UpdateWindowTimer);
 }

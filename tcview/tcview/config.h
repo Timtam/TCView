@@ -38,6 +38,7 @@ class Configuration
     std::vector<BaseProperty*> properties;
     inline void register_property(BaseProperty *p);
   public:
+    Property<bool> continuous{"playback", "continuous", true};
     Property<bool> looping{"playback", "looping", true};
     static Configuration * instance();
     void set_file(std::string filename);

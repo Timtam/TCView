@@ -16,6 +16,9 @@ class Sound
     void play();
     void stop();
     void set_looping(bool looping);
+    bool is_playing();
+    bool is_paused();
+    bool is_stopped();
 };
 
 bool AudioCanLoad();

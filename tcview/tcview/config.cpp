@@ -18,6 +18,7 @@ void Property<T>::set(std::string v)
 
 Configuration::Configuration()
 {
+  this->register_property(&(this->continuous));
   this->register_property(&(this->looping));
 }
 
