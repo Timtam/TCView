@@ -48,6 +48,16 @@ void Sound::set_looping(bool looping)
     BASS_ChannelFlags(this->sound, 0, BASS_SAMPLE_LOOP);
 }
 
+std::string Sound::get_filename()
+{
+  BOOL success;
+  BASS_CHANNELINFO info;
+  success = BASS_ChannelGetInfo(this->sound, &info);
+  if(!success)
+    throw std::runtime_error("unable to retrieve filename");
+  return std::string{info.filename};
+}
+
 void AudioInitialize()
 {
   BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);

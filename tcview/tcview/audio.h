@@ -11,6 +11,7 @@ class Sound
   public:
     Sound(std::string filename);
     void fade_out();
+    std::string get_filename();
     void load(std::string filename);
     void play();
     void stop();
