@@ -19,6 +19,9 @@ class Sound
     bool is_playing();
     bool is_paused();
     bool is_stopped();
+    void set_position(double pos);
+    double get_position();
+    double get_length();
 };
 
 bool AudioCanLoad();

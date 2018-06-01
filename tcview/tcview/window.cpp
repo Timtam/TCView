@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <windef.h>
 
 #define IDT_TIMER1 100
 #define IDT_TIMER2 200
@@ -14,17 +15,57 @@ LONG_PTR DefWinProc;
 unsigned int WindowCount = 0;
 time_t TextUpdateTime = 0;
 
-void toggle_looping(HWND win)
+// helpers
+
+std::string format_time(double t)
 {
-  Sound *sound;
+  std::string st{""};
+  int s = (int)t;
+  int mins = s / 60;
+  int hours = mins / 60;
+  s -= mins * 60;
+  st.resize(20);
+  sprintf_s(&st.front(), 20, "%02d:%02d:%02d", hours, mins, s);
+  st.resize( strlen( st.data() ));
+  st.shrink_to_fit();
+  return st;
+}
+
+void toggle_looping(Sound *snd)
+{
   Configuration::instance()->looping = !Configuration::instance()->looping;
-  sound = WindowGetSound(win);
-  if(sound != NULL)
-    sound->set_looping(Configuration::instance()->looping);
+  if(snd == NULL)
+    return;
+  snd->set_looping(Configuration::instance()->looping);
+}
+
+void skip_forward(Sound *snd)
+{
+  double t;
+  if(snd == NULL)
+    return;
+  t = snd->get_position();
+  t += 1.0;
+  if(t > snd->get_length())
+    t = snd->get_length();
+  snd->set_position(t);
+}
+
+void skip_backward(Sound *snd)
+{
+  double t;
+  if(snd == NULL)
+    return;
+  t = snd->get_position();
+  t -= 1.0;
+  if(t < 0)
+    t = .0;
+  snd->set_position(t);
 }
 
 void WindowUpdateText(HWND win)
 {
+  double pos, len;
   Sound *sound;
   std::string text{""};
   std::string file,ext;
@@ -42,6 +83,9 @@ void WindowUpdateText(HWND win)
       file.shrink_to_fit();
       ext.resize(strlen(ext.data()));
       ext.shrink_to_fit();
+      pos = sound->get_position();
+      len = sound->get_length();
+      text += format_time(pos) + " / " + format_time(len) + " ";
       text += file + ext;
     }
     catch (std::runtime_error &e)
@@ -80,10 +124,16 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch(wParam)
     {
       case 'L':
-        toggle_looping(hwnd);
+        toggle_looping(WindowGetSound(hwnd));
         return 0;
       case 'C':
         Configuration::instance()->continuous = !Configuration::instance()->continuous;
+        return 0;
+      case VK_LEFT:
+        skip_backward(WindowGetSound(hwnd));
+        return 0;
+      case VK_RIGHT:
+        skip_forward(WindowGetSound(hwnd));
         return 0;
     }
   }

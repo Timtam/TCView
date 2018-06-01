@@ -73,6 +73,21 @@ bool Sound::is_stopped()
   return BASS_ChannelIsActive(this->sound) == BASS_ACTIVE_STOPPED;
 }
 
+double Sound::get_position()
+{
+  return BASS_ChannelBytes2Seconds(this->sound, BASS_ChannelGetPosition(this->sound, BASS_POS_BYTE));
+}
+
+double Sound::get_length()
+{
+  return BASS_ChannelBytes2Seconds(this->sound, BASS_ChannelGetLength(this->sound, BASS_POS_BYTE));
+}
+
+void Sound::set_position(double pos)
+{
+  BASS_ChannelSetPosition(this->sound, BASS_ChannelSeconds2Bytes(this->sound, pos), BASS_POS_BYTE);
+}
+
 void AudioInitialize()
 {
   BASS_Init(-1, 48000, BASS_DEVICE_STEREO, NULL, NULL);
