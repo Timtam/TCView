@@ -129,7 +129,7 @@ void CALLBACK UpdateWindowTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTi
     TextUpdateTime = time(NULL);
   }
   sound = WindowGetSound(win);
-  if(sound != NULL && sound->is_stopped())
+  if(sound != NULL && sound->is_stopped() && Configuration::instance()->continuous)
   {
     SetWindowLongPtr(win, GWLP_WNDPROC, DefWinProc);
     DefWinProc = NULL;
