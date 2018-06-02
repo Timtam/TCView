@@ -136,7 +136,11 @@ void AudioLoadPlugins()
   std::string searchpattern{0};
   WIN32_FIND_DATAA ffd;
   // append the wildcards
-  searchpattern = currentdir + "\\plugins\\*.dll";
+  #ifdef _win64
+    searchpattern = currentdir + "\\plugins\\bass*_x64.dll";
+  #else
+    searchpattern = currentdir + "\\plugins\\bass*.dll";
+  #endif
 
   // searching all plugin files
   hFind = FindFirstFileA(searchpattern.c_str(), &ffd);
