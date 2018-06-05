@@ -47,9 +47,6 @@
     <ClCompile Include="config.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="api.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
     <ClCompile Include="window.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>

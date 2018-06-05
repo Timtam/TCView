@@ -102,12 +102,11 @@ FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
 }
 
 // At the global level, set the delay-load hooks.
-#ifndef DELAYIMP_INSECURE_WRITABLE_HOOKS
-#define DELAYIMP_INSECURE_WRITABLE_HOOKS
+#ifdef DELAYIMP_INSECURE_WRITABLE_HOOKS
+  const
 #endif
-
-const PfnDliHook __pfnDliNotifyHook2 = DelayLoadHook;
-const PfnDliHook __pfnDliFailureHook2 = DelayLoadHook;
+PfnDliHook __pfnDliNotifyHook2 = DelayLoadHook,
+           __pfnDliFailureHook2 = DelayLoadHook;
 
 HINSTANCE hinst;
 

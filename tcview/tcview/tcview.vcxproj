@@ -165,7 +165,6 @@
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="api.cpp" />
     <ClCompile Include="audio.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="stdafx.cpp">
