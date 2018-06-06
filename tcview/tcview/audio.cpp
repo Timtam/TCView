@@ -20,7 +20,7 @@ Sound::Sound(std::wstring filename)
 
 void Sound::load(std::wstring filename)
 {
-  this->sound = BASS_StreamCreateFile(false, filename.c_str(), 0, 0, BASS_STREAM_AUTOFREE | BASS_UNICODE);
+  this->sound = BASS_StreamCreateFile(false, filename.c_str(), 0, 0, BASS_STREAM_AUTOFREE | BASS_ASYNCFILE | BASS_UNICODE);
   if(this->sound == 0)
     throw std::invalid_argument("invalid filename");
 }
