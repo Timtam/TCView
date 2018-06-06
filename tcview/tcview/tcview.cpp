@@ -12,6 +12,7 @@
 #include <iterator>
 #include <sstream>
 #include <stdlib.h>
+#include <strsafe.h>
 
 // first of all, declare the delay linker entry point
 FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
@@ -170,7 +171,7 @@ void __stdcall ListGetDetectString(char *detectstring, int maxlen)
 {
   std::vector<std::string> exts = AudioGetExtensions();
   std::string detect{"MULTIMEDIA & ("};
-  unsigned int size;
+  size_t size;
   unsigned int i;
   if(exts.size() == 0)
     return;
@@ -183,11 +184,10 @@ void __stdcall ListGetDetectString(char *detectstring, int maxlen)
   detect += ")";
   if(detect.size() > maxlen)
     return;
-  size = maxlen - 1;
+  size = maxlen;
   if(detect.length() < size)
-    size = detect.length();
-  detect.copy(detectstring, size);
-  detectstring[size + 1] = '\0';
+    size = detect.length() + 1;
+  StringCchCopyA(detectstring, size, &detect.front() );
 }
 
 void __stdcall ListCloseWindow(HWND ListWin)
@@ -231,6 +231,7 @@ HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags)
   }
   catch (const std::invalid_argument& e)
   {
+    (void)e;
     cnt = WindowDestroy(res.first);
     if(cnt == 0)
       AudioShutdown();
@@ -261,6 +262,7 @@ int __stdcall ListLoadNextW(HWND ParentWin, HWND ListWin, wchar_t *FileToLoad, i
   }
   catch (const std::invalid_argument& e)
   {
+    (void)e;
     return LISTPLUGIN_ERROR;
   }
   WindowSetSound(ListWin, sound);

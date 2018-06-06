@@ -65,7 +65,7 @@ void skip_backward(Sound *snd)
 
 void volume_up(Sound *snd)
 {
-  Configuration::instance()->volume = Configuration::instance()->volume + 0.05;
+  Configuration::instance()->volume = Configuration::instance()->volume + (float)0.05;
   if(Configuration::instance()->volume > 1.0)
     Configuration::instance()->volume = 1.0;
   if(snd == NULL)
@@ -75,7 +75,7 @@ void volume_up(Sound *snd)
 
 void volume_down(Sound *snd)
 {
-  Configuration::instance()->volume = Configuration::instance()->volume - .05;
+  Configuration::instance()->volume = Configuration::instance()->volume - (float).05;
   if(Configuration::instance()->volume < 0)
     Configuration::instance()->volume = .0;
   if(snd == NULL)
@@ -110,6 +110,7 @@ void WindowUpdateText(HWND win)
     }
     catch (std::runtime_error &e)
     {
+      (void)e;
       text += L"(No File)";
     }
   }
