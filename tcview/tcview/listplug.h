@@ -35,7 +35,8 @@ typedef struct {
 	char DefaultIniName[MAX_PATH];
 } ListDefaultParamStruct;
 
-EXPORT HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags);
+EXPORT HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags);
+EXPORT int __stdcall ListLoadNextW(HWND ParentWin, HWND ListWin, wchar_t *FileToLoad, int ShowFlags);
 EXPORT void __stdcall ListCloseWindow(HWND ListWin);
 EXPORT void __stdcall ListGetDetectString(char* DetectString,int maxlen);
 EXPORT int __stdcall ListSearchText(HWND ListWin,char* SearchString,int SearchParameter);

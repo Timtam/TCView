@@ -17,16 +17,16 @@ time_t TextUpdateTime = 0;
 
 // helpers
 
-std::string format_time(double t)
+std::wstring format_time(double t)
 {
-  std::string st{""};
+  std::wstring st{0};
   int s = (int)t;
   int mins = s / 60;
   int hours = mins / 60;
   s -= mins * 60;
   st.resize(20);
-  sprintf_s(&st.front(), 20, "%02d:%02d:%02d", hours, mins, s);
-  st.resize( strlen( st.data() ));
+  swprintf_s(&st.front(), 20, L"%02d:%02d:%02d", hours, mins, s);
+  st.resize( wcslen( st.data() ));
   st.shrink_to_fit();
   return st;
 }
@@ -87,37 +87,37 @@ void WindowUpdateText(HWND win)
 {
   double pos, len;
   Sound *sound;
-  std::string text{""};
-  std::string file,ext;
+  std::wstring text{L""};
+  std::wstring file,ext;
   file.resize(MAX_PATH);
   ext.resize(MAX_PATH);
   sound = WindowGetSound(win);
   if(sound == NULL)
-    text += "(No File)";
+    text += L"(No File)";
   else
   {
     try
     {
-      _splitpath_s(sound->get_filename().c_str(), NULL, 0, NULL, 0, &file.front(), MAX_PATH, &ext.front(), MAX_PATH);
-      file.resize( strlen(file.data()));
+      _wsplitpath_s(sound->get_filename().c_str(), NULL, 0, NULL, 0, &file.front(), MAX_PATH, &ext.front(), MAX_PATH);
+      file.resize( wcslen(file.data()));
       file.shrink_to_fit();
-      ext.resize(strlen(ext.data()));
+      ext.resize( wcslen(ext.data()));
       ext.shrink_to_fit();
       pos = sound->get_position();
       len = sound->get_length();
-      text += format_time(pos) + " / " + format_time(len) + " ";
+      text += format_time(pos) + L" / " + format_time(len) + L" ";
       text += file + ext;
     }
     catch (std::runtime_error &e)
     {
-      text += "(No File)";
+      text += L"(No File)";
     }
   }
   if(Configuration::instance()->looping)
-    text += " (looping)";
+    text += L" (looping)";
   if(Configuration::instance()->continuous)
-    text += " (continuous playback)";
-  SetWindowTextA(win, text.c_str());
+    text += L" (continuous playback)";
+  SetWindowTextW(win, text.c_str());
 }
 
 void CALLBACK UpdateWindowTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTime)
@@ -131,11 +131,11 @@ void CALLBACK UpdateWindowTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTi
   sound = WindowGetSound(win);
   if(sound != NULL && sound->is_stopped() && Configuration::instance()->continuous)
   {
-    SetWindowLongPtr(win, GWLP_WNDPROC, DefWinProc);
+    SetWindowLongPtrW(win, GWLP_WNDPROC, DefWinProc);
     DefWinProc = NULL;
     WindowSetSound(win, (Sound*)NULL);
     delete sound;
-    PostMessage(GetParent(win), WM_COMMAND, MAKELONG(NULL, itm_next), (LPARAM)win);
+    PostMessageW(GetParent(win), WM_COMMAND, MAKELONG(NULL, itm_next), (LPARAM)win);
   }
 }
 
@@ -166,17 +166,17 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     }
   }
   if(DefWinProc != NULL)
-    return CallWindowProc((WNDPROC)DefWinProc, hwnd, msg, wParam, lParam);
+    return CallWindowProcW((WNDPROC)DefWinProc, hwnd, msg, wParam, lParam);
   return 0;
 }
 
 void CALLBACK ReplaceWindowProcTimer(HWND hwnd, UINT msg, UINT_PTR idEvent, DWORD dwTime)
 {
-  LONG_PTR winproc = GetWindowLongPtr(hwnd, GWLP_WNDPROC);
+  LONG_PTR winproc = GetWindowLongPtrW(hwnd, GWLP_WNDPROC);
   if(winproc != DefWinProc)
   {
     DefWinProc = winproc;
-    SetWindowLongPtr(hwnd, GWLP_WNDPROC, (LONG_PTR)WinProc);
+    SetWindowLongPtrW(hwnd, GWLP_WNDPROC, (LONG_PTR)WinProc);
     KillTimer(hwnd, idEvent);
   }
 }
@@ -195,7 +195,7 @@ std::pair<HWND, int> WindowCreateChild(HWND parent, HINSTANCE hinst)
 
   GetClientRect(parent,&r);
 
-  hwnd=CreateWindowA("EDIT",0,WS_CHILD | WS_VISIBLE | ES_READONLY,
+  hwnd=CreateWindowW(L"EDIT",0,WS_CHILD | WS_VISIBLE | ES_READONLY,
     r.left,r.top,r.right-r.left,
     r.bottom-r.top,parent,NULL,hinst,NULL);
   if(!hwnd)
@@ -210,18 +210,18 @@ std::pair<HWND, int> WindowCreateChild(HWND parent, HINSTANCE hinst)
 
 void WindowSetSound(HWND win, Sound *snd)
 {
-  SetWindowLongPtr(win, GWLP_USERDATA, (LONG_PTR)snd);
+  SetWindowLongPtrW(win, GWLP_USERDATA, (LONG_PTR)snd);
 }
 
 Sound *WindowGetSound(HWND win)
 {
-  return (Sound*)GetWindowLongPtr(win, GWLP_USERDATA);
+  return (Sound*)GetWindowLongPtrW(win, GWLP_USERDATA);
 }
 
 void WindowShow(HWND win)
 {
   ShowWindow(win, SW_SHOW);
-  DefWinProc = GetWindowLongPtr(win, GWLP_WNDPROC);
+  DefWinProc = GetWindowLongPtrW(win, GWLP_WNDPROC);
   SetTimer(win, IDT_TIMER1, 50, (TIMERPROC)ReplaceWindowProcTimer);
   SetTimer(win, IDT_TIMER2, 20, (TIMERPROC)UpdateWindowTimer);
 }

@@ -2,5 +2,6 @@
 
 #include <string>
 
-std::string GetModuleDirectory();
+std::wstring GetModuleDirectory();
 std::vector<std::string> string_split(const char *s, char delim);
+std::wstring mbs_to_wcs(std::string mbs);

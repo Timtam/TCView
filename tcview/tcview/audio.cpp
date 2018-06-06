@@ -13,14 +13,14 @@ void __ParseExtensions(const char *exts)
     Extensions.push_back(i.substr(2));
 }
 
-Sound::Sound(std::string filename)
+Sound::Sound(std::wstring filename)
 {
   this->load(filename);
 }
 
-void Sound::load(std::string filename)
+void Sound::load(std::wstring filename)
 {
-  this->sound = BASS_StreamCreateFile(false, filename.c_str(), 0, 0, BASS_STREAM_AUTOFREE);
+  this->sound = BASS_StreamCreateFile(false, filename.c_str(), 0, 0, BASS_STREAM_AUTOFREE | BASS_UNICODE);
   if(this->sound == 0)
     throw std::invalid_argument("invalid filename");
 }
@@ -48,14 +48,14 @@ void Sound::set_looping(bool looping)
     BASS_ChannelFlags(this->sound, 0, BASS_SAMPLE_LOOP);
 }
 
-std::string Sound::get_filename()
+std::wstring Sound::get_filename()
 {
   BOOL success;
   BASS_CHANNELINFO info;
   success = BASS_ChannelGetInfo(this->sound, &info);
   if(!success)
     throw std::runtime_error("unable to retrieve filename");
-  return std::string{info.filename};
+  return mbs_to_wcs(std::string{info.filename});
 }
 
 bool Sound::is_playing()
@@ -131,19 +131,19 @@ void AudioLoadPlugins()
   HPLUGIN hPlugin;
   HANDLE hFind = INVALID_HANDLE_VALUE;
   unsigned int i;
-  std::string currentdir = GetModuleDirectory();
-  std::string fullpath{0};
-  std::string searchpattern{0};
-  WIN32_FIND_DATAA ffd;
+  std::wstring currentdir = GetModuleDirectory();
+  std::wstring fullpath{0};
+  std::wstring searchpattern{0};
+  WIN32_FIND_DATAW ffd;
   // append the wildcards
   #ifdef _win64
-    searchpattern = currentdir + "\\plugins\\bass*_x64.dll";
+    searchpattern = currentdir + L"\\plugins\\bass*_x64.dll";
   #else
-    searchpattern = currentdir + "\\plugins\\bass*.dll";
+    searchpattern = currentdir + L"\\plugins\\bass*.dll";
   #endif
 
   // searching all plugin files
-  hFind = FindFirstFileA(searchpattern.c_str(), &ffd);
+  hFind = FindFirstFileW(searchpattern.c_str(), &ffd);
   if(hFind == INVALID_HANDLE_VALUE)
     return;
 
@@ -153,8 +153,8 @@ void AudioLoadPlugins()
       continue;
     else
     {
-      fullpath = currentdir + "\\plugins\\" + ffd.cFileName;
-      hPlugin = BASS_PluginLoad(fullpath.c_str(), 0);
+      fullpath = currentdir + L"\\plugins\\" + ffd.cFileName;
+      hPlugin = BASS_PluginLoad(fullpath.c_str(), BASS_UNICODE);
       if(!hPlugin)
         continue;
       hPluginInfo = (BASS_PLUGININFO*)BASS_PluginGetInfo(hPlugin);
@@ -162,5 +162,5 @@ void AudioLoadPlugins()
         __ParseExtensions(hPluginInfo->formats[i].exts);
     }
   }
-  while(FindNextFileA(hFind, &ffd) != 0);
+  while(FindNextFileW(hFind, &ffd) != 0);
 }

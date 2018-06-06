@@ -6,12 +6,12 @@
 #include "tcview.h"
 #include "window.h"
 #include "config.h"
-#include <delayimp.h>
-#include <stdlib.h>
 
 #include <algorithm>
+#include <delayimp.h>
 #include <iterator>
 #include <sstream>
+#include <stdlib.h>
 
 // first of all, declare the delay linker entry point
 FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
@@ -126,12 +126,21 @@ std::vector<std::string> string_split(const char *s, char delim) {
   return elems;
 }
 
-std::string GetModuleDirectory()
+std::wstring GetModuleDirectory()
 {
-  char currentdir[MAX_PATH];
-  GetModuleFileNameA(hinst, currentdir, _countof(currentdir));
-  PathRemoveFileSpecA(currentdir);
-  return std::string{currentdir};
+  wchar_t currentdir[MAX_PATH];
+  GetModuleFileNameW(hinst, currentdir, _countof(currentdir));
+  PathRemoveFileSpecW(currentdir);
+  return std::wstring{currentdir};
+}
+
+std::wstring mbs_to_wcs(std::string mbs)
+{
+  size_t r;
+  std::wstring ws(mbs.size(), L' '); // Overestimate number of code points.
+  mbstowcs_s(&r, &ws.front(), mbs.size()+1, mbs.c_str(), mbs.size());
+  ws.resize(r);
+  return ws;
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -196,7 +205,7 @@ void __stdcall ListCloseWindow(HWND ListWin)
     AudioShutdown();
 }
 
-HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
+HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags)
 {
   int cnt;
   std::pair<HWND, int> res;
@@ -214,7 +223,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 
   try
   {
-    sound = new Sound{std::string{FileToLoad}};
+    sound = new Sound{std::wstring{FileToLoad}};
     sound->set_looping(Configuration::instance()->looping);
     sound->set_volume(Configuration::instance()->volume);
     sound->play();
@@ -233,7 +242,7 @@ HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
   return res.first;
 }
 
-int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int ShowFlags)
+int __stdcall ListLoadNextW(HWND ParentWin, HWND ListWin, wchar_t *FileToLoad, int ShowFlags)
 {
   Sound *sound;
   sound = WindowGetSound(ListWin);
@@ -245,7 +254,7 @@ int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int S
   WindowSetSound(ListWin, (Sound*)NULL);
   try
   {
-    sound = new Sound{std::string{FileToLoad}};
+    sound = new Sound{std::wstring{FileToLoad}};
     sound->set_looping(Configuration::instance()->looping);
     sound->set_volume(Configuration::instance()->volume);
     sound->play();

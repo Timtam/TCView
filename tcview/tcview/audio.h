@@ -9,10 +9,10 @@ class Sound
   private:
     HSTREAM sound;
   public:
-    Sound(std::string filename);
+    Sound(std::wstring filename);
     void fade_out();
-    std::string get_filename();
-    void load(std::string filename);
+    std::wstring get_filename();
+    void load(std::wstring filename);
     void play();
     void stop();
     void set_looping(bool looping);
