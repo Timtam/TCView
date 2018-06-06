@@ -54,9 +54,4 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="tcview.def">
-      <Filter>Quelldateien</Filter>
-    </None>
-  </ItemGroup>
 </Project>

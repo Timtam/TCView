@@ -1,6 +1,0 @@
-EXPORTS
-  ListLoad
-  ListCloseWindow
-  ListGetDetectString
-  ListLoadNext
-  ListSetDefaultParams

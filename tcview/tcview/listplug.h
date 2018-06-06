@@ -1,5 +1,7 @@
 /* Contents of file listplug.h */
 
+#define EXPORT extern "C" __declspec(dllexport)
+
 #define lc_copy		1
 #define lc_newparams	2
 #define lc_selectall	3
@@ -33,16 +35,16 @@ typedef struct {
 	char DefaultIniName[MAX_PATH];
 } ListDefaultParamStruct;
 
-HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags);
-void __stdcall ListCloseWindow(HWND ListWin);
-void __stdcall ListGetDetectString(char* DetectString,int maxlen);
-int __stdcall ListSearchText(HWND ListWin,char* SearchString,int SearchParameter);
-int __stdcall ListSendCommand(HWND ListWin,int Command,int Parameter);
-int __stdcall ListPrint(HWND ListWin,char* FileToPrint,char* DefPrinter,
+EXPORT HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags);
+EXPORT void __stdcall ListCloseWindow(HWND ListWin);
+EXPORT void __stdcall ListGetDetectString(char* DetectString,int maxlen);
+EXPORT int __stdcall ListSearchText(HWND ListWin,char* SearchString,int SearchParameter);
+EXPORT int __stdcall ListSendCommand(HWND ListWin,int Command,int Parameter);
+EXPORT int __stdcall ListPrint(HWND ListWin,char* FileToPrint,char* DefPrinter,
                         int PrintFlags,RECT* Margins);
-int __stdcall ListNotificationReceived(HWND ListWin,int Message,WPARAM wParam,LPARAM lParam);
-void __stdcall ListSetDefaultParams(ListDefaultParamStruct* dps);
-HBITMAP __stdcall ListGetPreviewBitmap(char* FileToLoad,int width,int height,
+EXPORT int __stdcall ListNotificationReceived(HWND ListWin,int Message,WPARAM wParam,LPARAM lParam);
+EXPORT void __stdcall ListSetDefaultParams(ListDefaultParamStruct* dps);
+EXPORT HBITMAP __stdcall ListGetPreviewBitmap(char* FileToLoad,int width,int height,
     char* contentbuf,int contentbuflen);
 
 
