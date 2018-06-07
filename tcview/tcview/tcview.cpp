@@ -7,6 +7,10 @@
 #include "window.h"
 #include "config.h"
 
+#ifndef DELAYIMP_INSECURE_WRITABLE_HOOKS
+  #define DELAYIMP_INSECURE_WRITABLE_HOOKS
+#endif
+
 #include <algorithm>
 #include <delayimp.h>
 #include <iterator>
@@ -103,9 +107,6 @@ FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
 }
 
 // At the global level, set the delay-load hooks.
-#ifdef DELAYIMP_INSECURE_WRITABLE_HOOKS
-  const
-#endif
 PfnDliHook __pfnDliNotifyHook2 = DelayLoadHook,
            __pfnDliFailureHook2 = DelayLoadHook;
 
