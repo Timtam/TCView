@@ -74,6 +74,14 @@ void skip_end(Sound *snd)
   snd->set_position(len);
 }
 
+void pause_resume(Sound *snd)
+{
+  if(snd->is_paused())
+    snd->play();
+  else
+    snd->pause();
+}
+
 void volume_up(Sound *snd)
 {
   Configuration::instance()->volume = Configuration::instance()->volume + (float)0.05;
@@ -180,6 +188,9 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
       case VK_END:
         skip_end(WindowGetSound(hwnd));
+        return 0;
+      case VK_SPACE:
+        pause_resume(WindowGetSound(hwnd));
         return 0;
     }
   }

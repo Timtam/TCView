@@ -13,6 +13,7 @@ class Sound
     void fade_out();
     std::wstring get_filename();
     void load(std::wstring filename);
+    void pause();
     void play();
     void stop();
     void set_looping(bool looping);

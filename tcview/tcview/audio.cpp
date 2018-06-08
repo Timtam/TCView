@@ -25,9 +25,14 @@ void Sound::load(std::wstring filename)
     throw std::invalid_argument("invalid filename");
 }
 
+void Sound::pause()
+{
+  BASS_ChannelPause(this->sound);
+}
+
 void Sound::play()
 {
-  BASS_ChannelPlay(this->sound, true);
+  BASS_ChannelPlay(this->sound, false);
 }
 
 void Sound::fade_out()
