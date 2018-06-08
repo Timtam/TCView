@@ -1,6 +1,7 @@
 #pragma once
 
 #include "bass.h"
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -9,10 +10,10 @@ class Sound
   private:
     HSTREAM sound;
   public:
-    Sound(std::wstring filename);
+    Sound(std::experimental::filesystem::v1::path filename);
     void fade_out();
-    std::wstring get_filename();
-    void load(std::wstring filename);
+    std::experimental::filesystem::v1::path get_filename();
+    void load(std::experimental::filesystem::v1::path filename);
     void pause();
     void play();
     void stop();

@@ -13,12 +13,12 @@ void __ParseExtensions(const char *exts)
     Extensions.push_back(i.substr(2));
 }
 
-Sound::Sound(std::wstring filename)
+Sound::Sound(std::experimental::filesystem::v1::path filename)
 {
   this->load(filename);
 }
 
-void Sound::load(std::wstring filename)
+void Sound::load(std::experimental::filesystem::v1::path filename)
 {
   this->sound = BASS_StreamCreateFile(false, filename.c_str(), 0, 0, BASS_STREAM_AUTOFREE | BASS_ASYNCFILE | BASS_UNICODE);
   if(this->sound == 0)
@@ -53,14 +53,14 @@ void Sound::set_looping(bool looping)
     BASS_ChannelFlags(this->sound, 0, BASS_SAMPLE_LOOP);
 }
 
-std::wstring Sound::get_filename()
+std::experimental::filesystem::v1::path Sound::get_filename()
 {
   BOOL success;
   BASS_CHANNELINFO info;
   success = BASS_ChannelGetInfo(this->sound, &info);
   if(!success)
     throw std::runtime_error("unable to retrieve filename");
-  return mbs_to_wcs(std::string{info.filename});
+  return std::experimental::filesystem::v1::path{(wchar_t*)info.filename};
 }
 
 bool Sound::is_playing()

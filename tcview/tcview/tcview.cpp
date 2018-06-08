@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <delayimp.h>
+#include <filesystem>
 #include <iterator>
 #include <sstream>
 #include <stdlib.h>
@@ -21,7 +22,7 @@
 // first of all, declare the delay linker entry point
 FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
 {
-  std::string path;
+  std::experimental::filesystem::v1::path path{pdli->szDll};
   switch (dliNotify)
   {
     case dliStartProcessing:
@@ -42,24 +43,9 @@ FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
       // the dll name to load the DLL, which is the default behavior of 
       // the helper function.
       #ifdef _WIN64
-        std::string drive;
-        std::string dir;
-        std::string file;
-        std::string ext;
-        drive.resize(MAX_PATH);
-        dir.resize(MAX_PATH);
-        file.resize(MAX_PATH);
-        ext.resize(MAX_PATH);
-        _splitpath_s(pdli->szDll, &drive.front(), MAX_PATH, &dir.front(), MAX_PATH, &file.front(), MAX_PATH, &ext.front(), MAX_PATH);
-        drive.resize( strlen(drive.data() ));
-        dir.resize( strlen(dir.data() ));
-        file.resize( strlen( file.data()));
-        ext.resize( strlen(ext.data() ));
-        path = drive + dir + file + "_x64" + ext;
-      #else
-        path.assign(pdli->szDll);
+        path.assign(path.stem().string() + "_x64" + path.extension().string());
       #endif
-      HMODULE hLib = LoadLibraryA(path.c_str());
+      HMODULE hLib = LoadLibraryA(path.string().c_str());
       return reinterpret_cast<FARPROC>(hLib);
     }
 
@@ -136,15 +122,6 @@ std::wstring GetModuleDirectory()
   return std::wstring{currentdir};
 }
 
-std::wstring mbs_to_wcs(std::string mbs)
-{
-  size_t r;
-  std::wstring ws(mbs.size(), L' '); // Overestimate number of code points.
-  mbstowcs_s(&r, &ws.front(), mbs.size()+1, mbs.c_str(), mbs.size());
-  ws.resize(r);
-  return ws;
-}
-
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
@@ -215,16 +192,14 @@ HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags)
   res = WindowCreateChild(ParentWin, hinst);
 
   if(res.first == NULL)
-  {
     return NULL;
-  }
 
   if(res.second == 1)
     AudioInitialize();
 
   try
   {
-    sound = new Sound{std::wstring{FileToLoad}};
+    sound = new Sound{FileToLoad};
     sound->set_looping(Configuration::instance()->looping);
     sound->set_volume(Configuration::instance()->volume);
     sound->play();
@@ -256,7 +231,7 @@ int __stdcall ListLoadNextW(HWND ParentWin, HWND ListWin, wchar_t *FileToLoad, i
   WindowSetSound(ListWin, (Sound*)NULL);
   try
   {
-    sound = new Sound{std::wstring{FileToLoad}};
+    sound = new Sound{FileToLoad};
     sound->set_looping(Configuration::instance()->looping);
     sound->set_volume(Configuration::instance()->volume);
     sound->play();

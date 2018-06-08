@@ -107,9 +107,6 @@ void WindowUpdateText(HWND win)
   double pos, len;
   Sound *sound;
   std::wstring text{L""};
-  std::wstring file,ext;
-  file.resize(MAX_PATH);
-  ext.resize(MAX_PATH);
   sound = WindowGetSound(win);
   if(sound == NULL)
     text += L"(No File)";
@@ -117,15 +114,10 @@ void WindowUpdateText(HWND win)
   {
     try
     {
-      _wsplitpath_s(sound->get_filename().c_str(), NULL, 0, NULL, 0, &file.front(), MAX_PATH, &ext.front(), MAX_PATH);
-      file.resize( wcslen(file.data()));
-      file.shrink_to_fit();
-      ext.resize( wcslen(ext.data()));
-      ext.shrink_to_fit();
       pos = sound->get_position();
       len = sound->get_length();
       text += format_time(pos) + L" / " + format_time(len) + L" ";
-      text += file + ext;
+      text += sound->get_filename().filename();
     }
     catch (std::runtime_error &e)
     {
