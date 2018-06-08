@@ -63,6 +63,17 @@ void skip_backward(Sound *snd)
   snd->set_position(t);
 }
 
+void skip_start(Sound *snd)
+{
+  snd->set_position(.0);
+}
+
+void skip_end(Sound *snd)
+{
+  double len = snd->get_length();
+  snd->set_position(len);
+}
+
 void volume_up(Sound *snd)
 {
   Configuration::instance()->volume = Configuration::instance()->volume + (float)0.05;
@@ -163,6 +174,12 @@ LRESULT CALLBACK WinProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
       case VK_DOWN:
         volume_down(WindowGetSound(hwnd));
+        return 0;
+      case VK_HOME:
+        skip_start(WindowGetSound(hwnd));
+        return 0;
+      case VK_END:
+        skip_end(WindowGetSound(hwnd));
         return 0;
     }
   }
