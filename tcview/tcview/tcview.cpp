@@ -183,7 +183,7 @@ void __stdcall ListCloseWindow(HWND ListWin)
     AudioShutdown();
 }
 
-HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags)
+HWND TCViewLoad(HWND ParentWin, std::experimental::filesystem::v1::path FileToLoad)
 {
   int cnt;
   std::pair<HWND, int> res;
@@ -219,7 +219,7 @@ HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags)
   return res.first;
 }
 
-int __stdcall ListLoadNextW(HWND ParentWin, HWND ListWin, wchar_t *FileToLoad, int ShowFlags)
+int TCViewLoadNext(HWND ParentWin, HWND ListWin, std::experimental::filesystem::v1::path FileToLoad)
 {
   Sound *sound;
   sound = WindowGetSound(ListWin);
@@ -254,4 +254,24 @@ void __stdcall ListSetDefaultParams(ListDefaultParamStruct *dps)
   ini += "\\tcview.ini";
   ini.shrink_to_fit();
   Configuration::instance()->set_file(ini);
+}
+
+HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags)
+{
+  return TCViewLoad(ParentWin, std::experimental::filesystem::v1::path{FileToLoad});
+}
+
+HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
+{
+  return TCViewLoad(ParentWin, std::experimental::filesystem::v1::path{FileToLoad});
+}
+
+int __stdcall ListLoadNextW(HWND ParentWin, HWND ListWin, wchar_t *FileToLoad, int ShowFlags)
+{
+  return TCViewLoadNext(ParentWin, ListWin, std::experimental::filesystem::v1::path{FileToLoad});
+}
+
+int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int ShowFlags)
+{
+  return TCViewLoadNext(ParentWin, ListWin, std::experimental::filesystem::v1::path{FileToLoad});
 }
