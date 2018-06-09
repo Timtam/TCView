@@ -1,0 +1,9 @@
+LIBRARY
+EXPORTS
+  ListLoad
+    ListLoadW
+    ListLoadNext
+    ListLoadNextW
+    ListSetDefaultParams
+    ListGetDetectString
+    ListCloseWindow
