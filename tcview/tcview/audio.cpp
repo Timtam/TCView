@@ -136,16 +136,13 @@ void AudioLoadPlugins()
   HPLUGIN hPlugin;
   HANDLE hFind = INVALID_HANDLE_VALUE;
   unsigned int i;
-  std::wstring currentdir = GetModuleDirectory();
-  std::wstring fullpath{0};
-  std::wstring searchpattern{0};
+  std::experimental::filesystem::v1::path currentdir{GetModuleDirectory()};
+  std::experimental::filesystem::v1::path fullpath;
+  std::experimental::filesystem::v1::path searchpattern{currentdir};
   WIN32_FIND_DATAW ffd;
   // append the wildcards
-  #ifdef _win64
-    searchpattern = currentdir + L"\\plugins\\bass*_x64.dll";
-  #else
-    searchpattern = currentdir + L"\\plugins\\bass*.dll";
-  #endif
+  searchpattern.append("plugins");
+  searchpattern.append("bass*.dll");
 
   // searching all plugin files
   hFind = FindFirstFileW(searchpattern.c_str(), &ffd);
@@ -158,7 +155,9 @@ void AudioLoadPlugins()
       continue;
     else
     {
-      fullpath = currentdir + L"\\plugins\\" + ffd.cFileName;
+      fullpath = currentdir;
+      fullpath.append("plugins");
+      fullpath.append(ffd.cFileName);
       hPlugin = BASS_PluginLoad(fullpath.c_str(), BASS_UNICODE);
       if(!hPlugin)
         continue;

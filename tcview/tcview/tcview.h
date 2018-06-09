@@ -1,7 +1,7 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 
-std::wstring GetModuleDirectory();
+std::experimental::filesystem::v1::path GetModuleDirectory();
 std::vector<std::string> string_split(const char *s, char delim);
-std::wstring mbs_to_wcs(std::string mbs);

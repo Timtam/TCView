@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "bass.h"
 #include "listplug.h"
-#include "shlwapi.h"
 #include "audio.h"
 #include "tcview.h"
 #include "window.h"
@@ -22,7 +21,7 @@
 // first of all, declare the delay linker entry point
 FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
 {
-  std::experimental::filesystem::v1::path path{pdli->szDll};
+  std::experimental::filesystem::v1::path path;
   switch (dliNotify)
   {
     case dliStartProcessing:
@@ -42,9 +41,12 @@ FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
       // to load the DLL from the path. For simplicity, the sample uses 
       // the dll name to load the DLL, which is the default behavior of 
       // the helper function.
+      path.assign(pdli->szDll);
+      path.assign(path.stem());
       #ifdef _WIN64
-        path.assign(path.stem().string() + "_x64" + path.extension().string());
+        path += "_x64";
       #endif
+      path += ".dll";
       HMODULE hLib = LoadLibraryA(path.string().c_str());
       return reinterpret_cast<FARPROC>(hLib);
     }
@@ -114,12 +116,14 @@ std::vector<std::string> string_split(const char *s, char delim) {
   return elems;
 }
 
-std::wstring GetModuleDirectory()
+std::experimental::filesystem::v1::path GetModuleDirectory()
 {
+  std::experimental::filesystem::v1::path path;
   wchar_t currentdir[MAX_PATH];
   GetModuleFileNameW(hinst, currentdir, _countof(currentdir));
-  PathRemoveFileSpecW(currentdir);
-  return std::wstring{currentdir};
+  path.assign(currentdir);
+  path.remove_filename();
+  return path;
 }
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -248,11 +252,8 @@ int TCViewLoadNext(HWND ParentWin, HWND ListWin, std::experimental::filesystem::
 
 void __stdcall ListSetDefaultParams(ListDefaultParamStruct *dps)
 {
-  std::string ini{dps->DefaultIniName};
-  PathRemoveFileSpecA(&ini.front() );
-  ini.resize( strlen(ini.data() ));
-  ini += "\\tcview.ini";
-  ini.shrink_to_fit();
+  std::experimental::filesystem::v1::path ini{dps->DefaultIniName};
+  ini.replace_filename("tcview.ini");
   Configuration::instance()->set_file(ini);
 }
 

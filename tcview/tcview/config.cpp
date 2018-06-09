@@ -40,7 +40,7 @@ Configuration::CGuard::~CGuard()
   }
 }
 
-void Configuration::set_file(std::string filename)
+void Configuration::set_file(std::experimental::filesystem::v1::path filename)
 {
   std::string value;
   unsigned int i;
@@ -49,7 +49,7 @@ void Configuration::set_file(std::string filename)
   for(i=0;i<this->properties.size();i++)
   {
     value.resize(MAX_PATH);
-    GetPrivateProfileStringA(this->properties[i]->section.c_str(), this->properties[i]->key.c_str(), this->properties[i]->get().c_str(), &value.front(), MAX_PATH, filename.c_str());
+    GetPrivateProfileStringA(this->properties[i]->section.c_str(), this->properties[i]->key.c_str(), this->properties[i]->get().c_str(), &value.front(), MAX_PATH, filename.string().c_str());
     if(GetLastError() == 0x2)
       continue;
     value.resize( strlen(value.data() ));
@@ -71,7 +71,7 @@ void Configuration::write()
 {
   unsigned int i;
   for(i=0;i<this->properties.size();i++)
-    WritePrivateProfileStringA(this->properties[i]->section.c_str(), this->properties[i]->key.c_str(), this->properties[i]->get().c_str(), this->filename.c_str());
+    WritePrivateProfileStringA(this->properties[i]->section.c_str(), this->properties[i]->key.c_str(), this->properties[i]->get().c_str(), this->filename.string().c_str());
 }
 
 Configuration * Configuration::_instance = NULL;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -42,9 +43,9 @@ class Configuration
     Property<bool> looping{"playback", "looping", true};
     Property<float> volume{"playback", "volume", 1.0};
     static Configuration * instance();
-    void set_file(std::string filename);
+    void set_file(std::experimental::filesystem::v1::path filename);
   private:
-    std::string filename;
+    std::experimental::filesystem::v1::path filename;
     static Configuration *_instance;
     Configuration ();
     Configuration ( const Configuration& );
