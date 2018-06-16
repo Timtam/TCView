@@ -57,14 +57,27 @@ before_build:
   - copy /y bass24\c\bass.lib tcview\tcview\bass_x86.lib
   - copy /y bass24\c\x64\bass.lib tcview\tcview\bass_x64.lib
 
-# scripts to run after build
-after_build:
-  - mkdir dist
-  - mkdir dist\tcview
-  - copy /y tcview\x64\Release\tcview.wlx64 dist\tcview\tcview.wlx64
-  - copy /y tcview\Release\tcview.wlx dist\tcview\tcview.wlx
-  - copy /y C:\projects\bass24\bass.dll dist\tcview\bass.dll
-  - copy /y C:\projects\bass24\x64\bass.dll dist\tcview\bass_x64.dll
+for:
+-
+  matrix:
+    only:
+      - platform: x86
+
+  after_build:
+    - mkdir dist
+    - mkdir dist\tcview
+    - copy /y tcview\Release\tcview.wlx dist\tcview\tcview.wlx
+    - copy /y C:\projects\bass24\bass.dll dist\tcview\bass.dll
+-
+  matrix:
+    only:
+      - platform: x64
+
+  after_build:
+    - mkdir dist
+    - mkdir dist\tcview
+    - copy /y tcview\x64\Release\tcview.wlx64 dist\tcview\tcview.wlx64
+    - copy /y C:\projects\bass24\x64\bass.dll dist\tcview\bass_x64.dll
   
 # to run your custom scripts instead of automatic MSBuild
 build_script:
