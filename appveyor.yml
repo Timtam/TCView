@@ -51,15 +51,21 @@ build:
 before_build:
   - ps: |
       $wc = New-Object System.Net.WebClient
-      $wc.DownloadFile($Env:bass_url, "C:/projects/bass24.zip")
-  - 7z x C:\projects\bass24.zip -oc:\projects\bass24 -r
-  - copy /y C:\projects\bass24\c\bass.h C:\projects\tcview\tcview\tcview\bass.h
-  - copy /y C:\projects\bass24\c\bass.lib C:\projects\tcview\tcview\tcview\bass_x86.lib
-  - copy /y C:\projects\bass24\c\x64\bass.lib C:\projects\tcview\tcview\tcview\bass_x64.lib
+      $wc.DownloadFile($Env:bass_url, "bass24.zip")
+  - 7z x bass24.zip -oc:\projects\tcview\bass24 -r
+  - copy /y bass24\c\bass.h tcview\tcview\bass.h
+  - copy /y bass24\c\bass.lib tcview\tcview\bass_x86.lib
+  - copy /y bass24\c\x64\bass.lib tcview\tcview\bass_x64.lib
 
 # scripts to run after build
 after_build:
-
+  - mkdir dist
+  - mkdir dist\tcview
+  - copy /y tcview\x64\Release\tcview.wlx64 dist\tcview\tcview.wlx64
+  - copy /y tcview\Release\tcview.wlx dist\tcview\tcview.wlx
+  - copy /y C:\projects\bass24\bass.dll dist\tcview\bass.dll
+  - copy /y C:\projects\bass24\x64\bass.dll dist\tcview\bass_x64.dll
+  
 # to run your custom scripts instead of automatic MSBuild
 build_script:
 
@@ -67,21 +73,10 @@ build_script:
 #      artifacts configuration    #
 #---------------------------------#
 
-#artifacts:
-
-#  # pushing a single file
-#  - path: test.zip
-
-  # pushing a single file with environment variable in path and "Deployment name" specified
-#  - path: MyProject\bin\$(configuration)
-#    name: myapp
-
-  # pushing entire folder as a zip archive
-#  - path: logs
-
-  # pushing all *.nupkg files in directory
-#  - path: out\*.nupkg
-
+artifacts:
+  - path: dist
+    name: TCView
+    type: zip
 
 #---------------------------------#
 #     deployment configuration    #
