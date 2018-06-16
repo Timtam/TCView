@@ -49,11 +49,11 @@ before_build:
   - ps: |
       $wc = New-Object System.Net.WebClient
       $wc.DownloadFile("http://www.un4seen.com/files/bass24.zip", "C:/projects/tcview/bass24.zip")
-      $wc.DownloadFile("http://www.un4seen.com/files/bass_aac24.zip", "C:/projects/tcview/bass_aac24.zip")
-      $wc.DownloadFile("http://www.un4seen.com/files/bass_ac324.zip", "C:/projects/tcview/bass_ac324.zip")
-      $wc.DownloadFile("http://www.un4seen.com/files/bass_ape24.zip", "C:/projects/tcview/bass_ape24.zip")
-      $wc.DownloadFile("http://www.un4seen.com/files/bass_mpc24.zip", "C:/projects/tcview/bass_mpc24.zip")
-      $wc.DownloadFile("http://www.un4seen.com/files/bass_spx24.zip", "C:/projects/tcview/bass_spx24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_aac24.zip", "C:/projects/tcview/bass_aac24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_ac324.zip", "C:/projects/tcview/bass_ac324.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_ape24.zip", "C:/projects/tcview/bass_ape24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_mpc24.zip", "C:/projects/tcview/bass_mpc24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_spx24.zip", "C:/projects/tcview/bass_spx24.zip")
       $wc.DownloadFile("http://www.un4seen.com/files/bassalac24.zip", "C:/projects/tcview/bassalac24.zip")
       $wc.DownloadFile("http://www.un4seen.com/files/bassflac24.zip", "C:/projects/tcview/bassflac24.zip")
       $wc.DownloadFile("http://www.un4seen.com/files/bassopus24.zip", "C:/projects/tcview/bassopus24.zip")
