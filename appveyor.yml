@@ -23,6 +23,9 @@ branches:
 
 image: Visual Studio 2015
 
+environment:
+  bass_url: http://www.un4seen.com/files/bass24.zip
+
 platform:
   - x86
   - x64
@@ -46,6 +49,13 @@ build:
 
 # scripts to run before build
 before_build:
+  - PS:
+      $wc = New-Object System.Net.WebClient
+      $wc.DownloadFile($Env:bass_url, "C:/projects/bass24.zip")
+  - 7z x c:/projects/bass24.zip -oc:/projects/bass24 -r
+  - copy c:/projects/bass24/c/bass.h c:/projects/tcview/tcview/tcview/bass.h
+  - copy c:/projects/bass24/c/bass.lib c:/projects/tcview/tcview/tcview/bass_x86.lib
+  - copy c:/projects/bass24/c/x64/bass.lib c:/projects/tcview/tcview/tcview/bass_x64.lib
 
 # scripts to run after build
 after_build:
