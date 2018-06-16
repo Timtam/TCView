@@ -23,9 +23,6 @@ branches:
 
 image: Visual Studio 2015
 
-environment:
-  bass_url: http://www.un4seen.com/files/bass24.zip
-
 platform:
   - x86
   - x64
@@ -51,8 +48,28 @@ build:
 before_build:
   - ps: |
       $wc = New-Object System.Net.WebClient
-      $wc.DownloadFile($Env:bass_url, "C:/projects/tcview/bass24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bass24.zip", "C:/projects/tcview/bass24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bass_aac24.zip", "C:/projects/tcview/bass_aac24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bass_ac324.zip", "C:/projects/tcview/bass_ac324.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bass_ape24.zip", "C:/projects/tcview/bass_ape24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bass_mpc24.zip", "C:/projects/tcview/bass_mpc24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bass_spx24.zip", "C:/projects/tcview/bass_spx24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bassalac24.zip", "C:/projects/tcview/bassalac24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bassflac24.zip", "C:/projects/tcview/bassflac24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/bassopus24.zip", "C:/projects/tcview/bassopus24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/basswm24.zip", "C:/projects/tcview/basswm24.zip")
+      $wc.DownloadFile("http://www.un4seen.com/files/basswv24.zip", "C:/projects/tcview/basswv24.zip")
   - 7z x bass24.zip -oc:\projects\tcview\bass24 -r
+  - 7z x bass_aac24.zip -oc:\projects\tcview\bass_aac24 -r
+  - 7z x bass_ac324.zip -oc:\projects\tcview\bass_ac324 -r
+  - 7z x bass_ape24.zip -oc:\projects\tcview\bass_ape24 -r
+  - 7z x bass_mpc24.zip -oc:\projects\tcview\bass_mpc24 -r
+  - 7z x bass_spx24.zip -oc:\projects\tcview\bass_spx24 -r
+  - 7z x bassalac24.zip -oc:\projects\tcview\bassalac24 -r
+  - 7z x bassflac24.zip -oc:\projects\tcview\bassflac24 -r
+  - 7z x bassopus24.zip -oc:\projects\tcview\bassopus24 -r
+  - 7z x basswm24.zip -oc:\projects\tcview\basswm24 -r
+  - 7z x basswv24.zip -oc:\projects\tcview\basswv24 -r
   - copy /y bass24\c\bass.h tcview\tcview\bass.h
   - copy /y bass24\c\bass.lib tcview\tcview\bass_x86.lib
   - copy /y bass24\c\x64\bass.lib tcview\tcview\bass_x64.lib
@@ -66,8 +83,19 @@ for:
   after_build:
     - mkdir dist
     - mkdir dist\tcview
+    - mkdir dist\tcview\plugins
     - copy /y tcview\Release\tcview.wlx dist\tcview\tcview.wlx
     - copy /y bass24\bass.dll dist\tcview\bass.dll
+    - copy /y bass_aac24\bass_aac.dll dist\tcview\plugins\bass_aac.dll
+    - copy /y bass_ac324\bass_ac3.dll dist\tcview\plugins\bass_ac3.dll
+    - copy /y bass_ape24\bass_ape.dll dist\tcview\plugins\bass_ape.dll
+    - copy /y bass_mpc24\bass_mpc.dll dist\tcview\plugins\bass_mpc.dll
+    - copy /y bass_spx24\bass_spx.dll dist\tcview\plugins\bass_spx.dll
+    - copy /y bassalac24\bassalac.dll dist\tcview\plugins\bassalac.dll
+    - copy /y bassflac24\bassflac.dll dist\tcview\plugins\bassflac.dll
+    - copy /y bassopus24\bassopus.dll dist\tcview\plugins\bassopus.dll
+    - copy /y basswm24\basswma.dll dist\tcview\plugins\basswma.dll
+    - copy /y basswv24\basswv.dll dist\tcview\plugins\basswv.dll
 -
   matrix:
     only:
@@ -76,8 +104,19 @@ for:
   after_build:
     - mkdir dist
     - mkdir dist\tcview
+    - mkdir dist\tcview\plugins
     - copy /y tcview\x64\Release\tcview.wlx64 dist\tcview\tcview.wlx64
     - copy /y bass24\x64\bass.dll dist\tcview\bass_x64.dll
+    - copy /y bass_aac24\x64\bass_aac.dll dist\tcview\plugins\bass_aac_x64.dll
+    - copy /y bass_ac324\x64\bass_ac3.dll dist\tcview\plugins\bass_ac3_x64.dll
+    - copy /y bass_ape24\x64\bass_ape.dll dist\tcview\plugins\bass_ape_x64.dll
+    - copy /y bass_mpc24\x64\bass_mpc.dll dist\tcview\plugins\bass_mpc_x64.dll
+    - copy /y bass_spx24\x64\bass_spx.dll dist\tcview\plugins\bass_spx_x64.dll
+    - copy /y bassalac24\x64\bassalac.dll dist\tcview\plugins\bassalac_x64.dll
+    - copy /y bassflac24\x64\bassflac.dll dist\tcview\plugins\bassflac_x64.dll
+    - copy /y bassopus24\x64\bassopus.dll dist\tcview\plugins\bassopus_x64.dll
+    - copy /y basswm24\x64\basswma.dll dist\tcview\plugins\basswma_x64.dll
+    - copy /y basswv24\x64\basswv.dll dist\tcview\plugins\basswv_x64.dll
   
 # to run your custom scripts instead of automatic MSBuild
 build_script:
