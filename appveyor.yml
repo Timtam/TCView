@@ -67,7 +67,7 @@ for:
     - mkdir dist
     - mkdir dist\tcview
     - copy /y tcview\Release\tcview.wlx dist\tcview\tcview.wlx
-    - copy /y C:\projects\bass24\bass.dll dist\tcview\bass.dll
+    - copy /y bass24\bass.dll dist\tcview\bass.dll
 -
   matrix:
     only:
@@ -77,7 +77,7 @@ for:
     - mkdir dist
     - mkdir dist\tcview
     - copy /y tcview\x64\Release\tcview.wlx64 dist\tcview\tcview.wlx64
-    - copy /y C:\projects\bass24\x64\bass.dll dist\tcview\bass_x64.dll
+    - copy /y bass24\x64\bass.dll dist\tcview\bass_x64.dll
   
 # to run your custom scripts instead of automatic MSBuild
 build_script:
