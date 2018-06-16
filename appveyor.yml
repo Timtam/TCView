@@ -51,7 +51,7 @@ build:
 before_build:
   - ps: |
       $wc = New-Object System.Net.WebClient
-      $wc.DownloadFile($Env:bass_url, "bass24.zip")
+      $wc.DownloadFile($Env:bass_url, "C:/projects/tcview/bass24.zip")
   - 7z x bass24.zip -oc:\projects\tcview\bass24 -r
   - copy /y bass24\c\bass.h tcview\tcview\bass.h
   - copy /y bass24\c\bass.lib tcview\tcview\bass_x86.lib
