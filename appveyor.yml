@@ -49,7 +49,7 @@ build:
 
 # scripts to run before build
 before_build:
-  - PS:
+  - ps: |
       $wc = New-Object System.Net.WebClient
       $wc.DownloadFile($Env:bass_url, "C:/projects/bass24.zip")
   - 7z x c:/projects/bass24.zip -oc:/projects/bass24 -r
