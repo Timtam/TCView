@@ -42,7 +42,7 @@ matrix:
 
 build:
   parallel: true
-  project: tcview/tcview.sln      # path to Visual Studio solution or project
+  project: tcview\tcview.sln      # path to Visual Studio solution or project
 
   # MSBuild verbosity level
   verbosity: detailed
@@ -52,10 +52,10 @@ before_build:
   - ps: |
       $wc = New-Object System.Net.WebClient
       $wc.DownloadFile($Env:bass_url, "C:/projects/bass24.zip")
-  - 7z x c:/projects/bass24.zip -oc:/projects/bass24 -r
-  - xcopy c:/projects/bass24/c/bass.h c:/projects/tcview/tcview/tcview/bass.h
-  - xcopy c:/projects/bass24/c/bass.lib c:/projects/tcview/tcview/tcview/bass_x86.lib
-  - xcopy c:/projects/bass24/c/x64/bass.lib c:/projects/tcview/tcview/tcview/bass_x64.lib
+  - 7z x C:\projects\bass24.zip -oc:\projects\bass24 -r
+  - xcopy C:\projects\bass24\c\bass.h C:\projects\tcview\tcview\tcview\bass.h
+  - xcopy C:\projects\bass24\c\bass.lib C:\projects\tcview\tcview\tcview\bass_x86.lib
+  - xcopy C:\projects\bass24\c\x64\bass.lib C:\projects\tcview\tcview\tcview\bass_x64.lib
 
 # scripts to run after build
 after_build:
