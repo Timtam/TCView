@@ -41,12 +41,12 @@ FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
       // to load the DLL from the path. For simplicity, the sample uses 
       // the dll name to load the DLL, which is the default behavior of 
       // the helper function.
-      path.assign(pdli->szDll);
-      path.assign(path.stem());
       #ifdef _WIN64
-        path += "_x64";
+        path.assign("x64");
+      #else
+        path.assign("x86");
       #endif
-      path += ".dll";
+      path.append(pdli->szDll);
       HMODULE hLib = LoadLibraryA(path.string().c_str());
       return reinterpret_cast<FARPROC>(hLib);
     }

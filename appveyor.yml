@@ -77,19 +77,19 @@ for:
   after_build:
     - mkdir dist
     - mkdir dist\tcview
-    - mkdir dist\tcview\plugins
+    - mkdir dist\tcview\x86
     - copy /y tcview\Release\tcview.wlx dist\tcview\tcview.wlx
-    - copy /y bass24\bass.dll dist\tcview\bass.dll
-    - copy /y bass_aac24\bass_aac.dll dist\tcview\plugins\bass_aac.dll
-    - copy /y bass_ac324\bass_ac3.dll dist\tcview\plugins\bass_ac3.dll
-    - copy /y bass_ape24\bass_ape.dll dist\tcview\plugins\bass_ape.dll
-    - copy /y bass_mpc24\bass_mpc.dll dist\tcview\plugins\bass_mpc.dll
-    - copy /y bass_spx24\bass_spx.dll dist\tcview\plugins\bass_spx.dll
-    - copy /y bassalac24\bassalac.dll dist\tcview\plugins\bassalac.dll
-    - copy /y bassflac24\bassflac.dll dist\tcview\plugins\bassflac.dll
-    - copy /y bassopus24\bassopus.dll dist\tcview\plugins\bassopus.dll
-    - copy /y basswm24\basswma.dll dist\tcview\plugins\basswma.dll
-    - copy /y basswv24\basswv.dll dist\tcview\plugins\basswv.dll
+    - copy /y bass24\bass.dll dist\tcview\x86\bass.dll
+    - copy /y bass_aac24\bass_aac.dll dist\tcview\x86\bass_aac.dll
+    - copy /y bass_ac324\bass_ac3.dll dist\tcview\x86\bass_ac3.dll
+    - copy /y bass_ape24\bass_ape.dll dist\tcview\x86\bass_ape.dll
+    - copy /y bass_mpc24\bass_mpc.dll dist\tcview\x86\bass_mpc.dll
+    - copy /y bass_spx24\bass_spx.dll dist\tcview\x86\bass_spx.dll
+    - copy /y bassalac24\bassalac.dll dist\tcview\x86\bassalac.dll
+    - copy /y bassflac24\bassflac.dll dist\tcview\x86\bassflac.dll
+    - copy /y bassopus24\bassopus.dll dist\tcview\x86\bassopus.dll
+    - copy /y basswm24\basswma.dll dist\tcview\x86\basswma.dll
+    - copy /y basswv24\basswv.dll dist\tcview\x86\basswv.dll
 -
   matrix:
     only:
@@ -98,19 +98,19 @@ for:
   after_build:
     - mkdir dist
     - mkdir dist\tcview
-    - mkdir dist\tcview\plugins
+    - mkdir dist\tcview\x64
     - copy /y tcview\x64\Release\tcview.wlx64 dist\tcview\tcview.wlx64
-    - copy /y bass24\x64\bass.dll dist\tcview\bass_x64.dll
-    - copy /y bass_aac24\x64\bass_aac.dll dist\tcview\plugins\bass_aac_x64.dll
-    - copy /y bass_ac324\x64\bass_ac3.dll dist\tcview\plugins\bass_ac3_x64.dll
-    - copy /y bass_ape24\x64\bass_ape.dll dist\tcview\plugins\bass_ape_x64.dll
-    - copy /y bass_mpc24\x64\bass_mpc.dll dist\tcview\plugins\bass_mpc_x64.dll
-    - copy /y bass_spx24\x64\bass_spx.dll dist\tcview\plugins\bass_spx_x64.dll
-    - copy /y bassalac24\x64\bassalac.dll dist\tcview\plugins\bassalac_x64.dll
-    - copy /y bassflac24\x64\bassflac.dll dist\tcview\plugins\bassflac_x64.dll
-    - copy /y bassopus24\x64\bassopus.dll dist\tcview\plugins\bassopus_x64.dll
-    - copy /y basswm24\x64\basswma.dll dist\tcview\plugins\basswma_x64.dll
-    - copy /y basswv24\x64\basswv.dll dist\tcview\plugins\basswv_x64.dll
+    - copy /y bass24\x64\bass.dll dist\tcview\x64\bass.dll
+    - copy /y bass_aac24\x64\bass_aac.dll dist\tcview\x64\bass_aac.dll
+    - copy /y bass_ac324\x64\bass_ac3.dll dist\tcview\x64\bass_ac3.dll
+    - copy /y bass_ape24\x64\bass_ape.dll dist\tcview\x64\bass_ape.dll
+    - copy /y bass_mpc24\x64\bass_mpc.dll dist\tcview\x64\bass_mpc.dll
+    - copy /y bass_spx24\x64\bass_spx.dll dist\tcview\x64\bass_spx.dll
+    - copy /y bassalac24\x64\bassalac.dll dist\tcview\x64\bassalac.dll
+    - copy /y bassflac24\x64\bassflac.dll dist\tcview\x64\bassflac.dll
+    - copy /y bassopus24\x64\bassopus.dll dist\tcview\x64\bassopus.dll
+    - copy /y basswm24\x64\basswma.dll dist\tcview\x64\basswma.dll
+    - copy /y basswv24\x64\basswv.dll dist\tcview\x64\basswv.dll
   
 # to run your custom scripts instead of automatic MSBuild
 build_script:

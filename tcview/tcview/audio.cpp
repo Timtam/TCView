@@ -138,10 +138,14 @@ void AudioLoadPlugins()
   unsigned int i;
   std::experimental::filesystem::v1::path currentdir{GetModuleDirectory()};
   std::experimental::filesystem::v1::path fullpath;
-  std::experimental::filesystem::v1::path searchpattern{currentdir};
+  std::experimental::filesystem::v1::path searchpattern;
   WIN32_FIND_DATAW ffd;
+  #ifdef _WIN64
+    currentdir.append("x64");
+  #else
+    currentdir.append("x86");
+  #endif
   // append the wildcards
-  searchpattern.append("plugins");
   searchpattern.append("bass*.dll");
 
   // searching all plugin files
@@ -156,7 +160,6 @@ void AudioLoadPlugins()
     else
     {
       fullpath = currentdir;
-      fullpath.append("plugins");
       fullpath.append(ffd.cFileName);
       hPlugin = BASS_PluginLoad(fullpath.c_str(), BASS_UNICODE);
       if(!hPlugin)
