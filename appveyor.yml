@@ -136,7 +136,7 @@ deploy:
   description: 'Total Commander audio preview plugin version $(appveyor_build_version)'
   on:
     branch: master
-#    appveyor_repo_tags: true
+    appveyor_repo_tags: true
 
 # scripts to run before deployment
 before_deploy:
