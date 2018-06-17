@@ -9,13 +9,7 @@
 #---------------------------------#
 
 # version format
-version: 0.1.{build}
-
-# branches to build
-branches:
-  # whitelist
-  only:
-    - appveyor
+version: 0.1.0-{build}
 
 #---------------------------------#
 #    environment configuration    #
@@ -127,34 +121,22 @@ build_script:
 
 artifacts:
   - path: dist
-    name: TCView
+    name: TCView-$(PLATFORM)
     type: zip
 
 #---------------------------------#
 #     deployment configuration    #
 #---------------------------------#
 
-# providers: Local, FTP, WebDeploy, AzureCS, AzureBlob, S3, NuGet, Environment
-# provider name are case-sensitive!
-#deploy:
-#  - provider: FTP
-#    username: admin
-#    password: psw
-
-#  - provider: WebDeploy
-#    url: http://www.deploy.com/myendpoint
-#    on:
-#      branch: release
-#      platform: x86
-#      configuration: debug
-
-#  - provider: Environment
-#    name: staging
-#    on:
-#      branch: staging
-#      environment:
-#      var1: value1
-#      var2: value2
+deploy:
+  provider: GitHub
+  auth_token:
+    secure: HDqLpq/EX/d3frvb4uro27DpWvfDeGaHbIGtUoVTWCSE4bjCySmEXFoH9EOQtEet
+  release: v$(appveyor_build_version)
+  description: 'Total Commander audio preview plugin version $(appveyor_build_version)'
+  on:
+    branch: master
+#    appveyor_repo_tags: true
 
 # scripts to run before deployment
 before_deploy:
@@ -164,9 +146,6 @@ after_deploy:
 
 # to run your custom scripts instead of provider deployments
 deploy_script:
-
-# to disable deployment
-deploy: off
 
 #---------------------------------#
 #        global handlers          #
