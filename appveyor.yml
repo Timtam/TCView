@@ -121,7 +121,7 @@ build_script:
 
 artifacts:
   - path: dist
-    name: TCView-$(appveyor_build_version)-$(PLATFORM)
+    name: TCView-$(appveyor_build_version)_$(PLATFORM)
     type: zip
 
 #---------------------------------#
