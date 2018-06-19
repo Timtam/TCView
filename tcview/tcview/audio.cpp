@@ -146,6 +146,7 @@ void AudioLoadPlugins()
     currentdir.append("x86");
   #endif
   // append the wildcards
+  searchpattern.assign(currentdir);
   searchpattern.append("bass*.dll");
 
   // searching all plugin files
