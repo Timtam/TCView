@@ -134,13 +134,13 @@ BOOL APIENTRY DllMain( HMODULE hModule,
   switch (ul_reason_for_call)
   {
   case DLL_PROCESS_ATTACH:
-    if(AudioCanLoad() == false)
+    if(Audio::CanLoad() == false)
       return FALSE;
     hinst=(HINSTANCE)hModule;
-    AudioLoadPlugins();
+    Audio::LoadPlugins();
     break;
   case DLL_PROCESS_DETACH:
-    AudioUnloadPlugins();
+    Audio::UnloadPlugins();
     break;
   case DLL_THREAD_ATTACH:
   case DLL_THREAD_DETACH:
@@ -151,7 +151,7 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 void __stdcall ListGetDetectString(char *detectstring, int maxlen)
 {
-  std::vector<std::string> exts = AudioGetExtensions();
+  std::vector<std::string> exts = Audio::GetExtensions();
   std::string detect{"MULTIMEDIA & ("};
   size_t size;
   unsigned int i;
@@ -175,23 +175,23 @@ void __stdcall ListGetDetectString(char *detectstring, int maxlen)
 void __stdcall ListCloseWindow(HWND ListWin)
 {
   int cnt;
-  Sound *sound = WindowGetSound(ListWin);
+  Audio::Sound *sound = WindowGetSound(ListWin);
   if(sound != NULL)
   {
     sound->stop();
     delete sound;
-    WindowSetSound(ListWin, (Sound*)NULL);
+    WindowSetSound(ListWin, (Audio::Sound*)NULL);
   }
   cnt = WindowDestroy(ListWin);
   if(cnt == 0)
-    AudioShutdown();
+    Audio::Shutdown();
 }
 
 HWND TCViewLoad(HWND ParentWin, std::experimental::filesystem::v1::path FileToLoad)
 {
   int cnt;
   std::pair<HWND, int> res;
-  Sound *sound;
+  Audio::Sound *sound;
 
   res = WindowCreateChild(ParentWin, hinst);
 
@@ -199,11 +199,11 @@ HWND TCViewLoad(HWND ParentWin, std::experimental::filesystem::v1::path FileToLo
     return NULL;
 
   if(res.second == 1)
-    AudioInitialize();
+    Audio::Initialize();
 
   try
   {
-    sound = new Sound{FileToLoad};
+    sound = new Audio::Sound{FileToLoad};
     sound->set_looping(Configuration::instance()->looping);
     sound->set_volume(Configuration::instance()->volume);
     sound->play();
@@ -214,7 +214,7 @@ HWND TCViewLoad(HWND ParentWin, std::experimental::filesystem::v1::path FileToLo
     (void)e;
     cnt = WindowDestroy(res.first);
     if(cnt == 0)
-      AudioShutdown();
+      Audio::Shutdown();
     return NULL;
   }
 
@@ -225,17 +225,17 @@ HWND TCViewLoad(HWND ParentWin, std::experimental::filesystem::v1::path FileToLo
 
 int TCViewLoadNext(HWND ParentWin, HWND ListWin, std::experimental::filesystem::v1::path FileToLoad)
 {
-  Sound *sound;
+  Audio::Sound *sound;
   sound = WindowGetSound(ListWin);
   if(sound != NULL)
   {
     sound->fade_out();
     delete sound;
   }
-  WindowSetSound(ListWin, (Sound*)NULL);
+  WindowSetSound(ListWin, (Audio::Sound*)NULL);
   try
   {
-    sound = new Sound{FileToLoad};
+    sound = new Audio::Sound{FileToLoad};
     sound->set_looping(Configuration::instance()->looping);
     sound->set_volume(Configuration::instance()->volume);
     sound->play();

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "audio.h"
 #include "config.h"
 #include "listplug.h"
 #include "window.h"
@@ -31,7 +30,7 @@ std::wstring format_time(double t)
   return st;
 }
 
-void toggle_looping(Sound *snd)
+void toggle_looping(Audio::Sound *snd)
 {
   Configuration::instance()->looping = !Configuration::instance()->looping;
   if(snd == NULL)
@@ -39,7 +38,7 @@ void toggle_looping(Sound *snd)
   snd->set_looping(Configuration::instance()->looping);
 }
 
-void skip_forward(Sound *snd)
+void skip_forward(Audio::Sound *snd)
 {
   double t;
   if(snd == NULL)
@@ -51,7 +50,7 @@ void skip_forward(Sound *snd)
   snd->set_position(t);
 }
 
-void skip_backward(Sound *snd)
+void skip_backward(Audio::Sound *snd)
 {
   double t;
   if(snd == NULL)
@@ -63,18 +62,18 @@ void skip_backward(Sound *snd)
   snd->set_position(t);
 }
 
-void skip_start(Sound *snd)
+void skip_start(Audio::Sound *snd)
 {
   snd->set_position(.0);
 }
 
-void skip_end(Sound *snd)
+void skip_end(Audio::Sound *snd)
 {
   double len = snd->get_length();
   snd->set_position(len);
 }
 
-void pause_resume(Sound *snd)
+void pause_resume(Audio::Sound *snd)
 {
   if(snd->is_paused())
     snd->play();
@@ -82,7 +81,7 @@ void pause_resume(Sound *snd)
     snd->pause();
 }
 
-void volume_up(Sound *snd)
+void volume_up(Audio::Sound *snd)
 {
   Configuration::instance()->volume = Configuration::instance()->volume + (float)0.05;
   if(Configuration::instance()->volume > 1.0)
@@ -92,7 +91,7 @@ void volume_up(Sound *snd)
   snd->set_volume(Configuration::instance()->volume);
 }
 
-void volume_down(Sound *snd)
+void volume_down(Audio::Sound *snd)
 {
   Configuration::instance()->volume = Configuration::instance()->volume - (float).05;
   if(Configuration::instance()->volume < 0)
@@ -105,7 +104,7 @@ void volume_down(Sound *snd)
 void WindowUpdateText(HWND win)
 {
   double pos, len;
-  Sound *sound;
+  Audio::Sound *sound;
   std::wstring text{L""};
   sound = WindowGetSound(win);
   if(sound == NULL)
@@ -134,7 +133,7 @@ void WindowUpdateText(HWND win)
 
 void CALLBACK UpdateWindowTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTime)
 {
-  Sound *sound;
+  Audio::Sound *sound;
   if(time(NULL) - TextUpdateTime >= 1)
   {
     WindowUpdateText(win);
@@ -145,7 +144,7 @@ void CALLBACK UpdateWindowTimer(HWND win, UINT msg, UINT_PTR idEvent, DWORD dwTi
   {
     SetWindowLongPtrW(win, GWLP_WNDPROC, DefWinProc);
     DefWinProc = NULL;
-    WindowSetSound(win, (Sound*)NULL);
+    WindowSetSound(win, (Audio::Sound*)NULL);
     delete sound;
     PostMessageW(GetParent(win), WM_COMMAND, MAKELONG(NULL, itm_next), (LPARAM)win);
   }
@@ -224,19 +223,19 @@ std::pair<HWND, int> WindowCreateChild(HWND parent, HINSTANCE hinst)
 
   WindowCount++;
 
-  WindowSetSound(hwnd, (Sound*)NULL);
+  WindowSetSound(hwnd, (Audio::Sound*)NULL);
 
   return std::make_pair(hwnd, WindowCount);
 }
 
-void WindowSetSound(HWND win, Sound *snd)
+void WindowSetSound(HWND win, Audio::Sound *snd)
 {
   SetWindowLongPtrW(win, GWLP_USERDATA, (LONG_PTR)snd);
 }
 
-Sound *WindowGetSound(HWND win)
+Audio::Sound *WindowGetSound(HWND win)
 {
-  return (Sound*)GetWindowLongPtrW(win, GWLP_USERDATA);
+  return (Audio::Sound*)GetWindowLongPtrW(win, GWLP_USERDATA);
 }
 
 void WindowShow(HWND win)
