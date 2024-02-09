@@ -1,0 +1,60 @@
+on:
+  push: {}
+  pull_request: {}
+
+jobs:
+  windows:
+    runs-on: windows-2022
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    steps:
+      - 
+        name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - 
+        name: "Download BASS"
+        shell: powershell
+        run: |
+          $wc = New-Object System.Net.WebClient
+          $wc.DownloadFile("http://www.un4seen.com/files/bass24.zip", (Join-Path ($pwd).path "bass24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_aac24.zip", (Join-Path ($pwd).path "bass_aac24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_ac324.zip", (Join-Path ($pwd).path "bass_ac324.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_ape24.zip", (Join-Path ($pwd).path "bass_ape24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_mpc24.zip", (Join-Path ($pwd).path "bass_mpc24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/z/2/bass_spx24.zip", (Join-Path ($pwd).path "bass_spx24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/bassalac24.zip", (Join-Path ($pwd).path "bassalac24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/bassflac24.zip", (Join-Path ($pwd).path "bassflac24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/bassopus24.zip", (Join-Path ($pwd).path "bassopus24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/basswm24.zip", (Join-Path ($pwd).path "basswm24.zip"))
+          $wc.DownloadFile("http://www.un4seen.com/files/basswv24.zip", (Join-Path ($pwd).path "basswv24.zip"))
+          & 7z --% x bass24.zip -obass24 -r
+          & 7z --% x bass_aac24.zip -obass_aac24 -r
+          & 7z --% x bass_ac324.zip -obass_ac324 -r
+          & 7z --% x bass_ape24.zip -obass_ape24 -r
+          & 7z --% x bass_mpc24.zip -obass_mpc24 -r
+          & 7z --% x bass_spx24.zip -obass_spx24 -r
+          & 7z --% x bassalac24.zip -obassalac24 -r
+          & 7z --% x bassflac24.zip -obassflac24 -r
+          & 7z --% x bassopus24.zip -obassopus24 -r
+          & 7z --% x basswm24.zip -obasswm24 -r
+          & 7z --% x basswv24.zip -obasswv24 -r
+          Copy-Item "bass24\c\bass.h" -Destination tcview
+          Copy-Item "bass24\c\bass.lib" -Destination "tcview\bass_x86.lib"
+          Copy-Item "bass24\c\x64\bass.lib" -Destination "tcview\bass_x64.lib"
+      -
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x86
+          vsversion: 2015
+      - 
+        name: "Build x86"
+        run: msbuild tcview.sln /p:Configuration=Release
+      -
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+          vsversion: 2015
+      - 
+        name: "Build x64"
+        run: msbuild tcview.sln /p:Configuration=Release
