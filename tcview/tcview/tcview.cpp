@@ -21,7 +21,7 @@
 // first of all, declare the delay linker entry point
 FARPROC WINAPI DelayLoadHook(unsigned dliNotify, PDelayLoadInfo pdli)
 {
-  std::experimental::filesystem::v1::path path;
+  std::filesystem::path path;
   switch (dliNotify)
   {
     case dliStartProcessing:
@@ -116,9 +116,9 @@ std::vector<std::string> string_split(const char *s, char delim) {
   return elems;
 }
 
-std::experimental::filesystem::v1::path GetModuleDirectory()
+std::filesystem::path GetModuleDirectory()
 {
-  std::experimental::filesystem::v1::path path;
+  std::filesystem::path path;
   wchar_t currentdir[MAX_PATH];
   GetModuleFileNameW(hinst, currentdir, _countof(currentdir));
   path.assign(currentdir);
@@ -187,7 +187,7 @@ void __stdcall ListCloseWindow(HWND ListWin)
     Audio::Shutdown();
 }
 
-HWND TCViewLoad(HWND ParentWin, std::experimental::filesystem::v1::path FileToLoad)
+HWND TCViewLoad(HWND ParentWin, std::filesystem::path FileToLoad)
 {
   int cnt;
   std::pair<HWND, int> res;
@@ -223,7 +223,7 @@ HWND TCViewLoad(HWND ParentWin, std::experimental::filesystem::v1::path FileToLo
   return res.first;
 }
 
-int TCViewLoadNext(HWND ParentWin, HWND ListWin, std::experimental::filesystem::v1::path FileToLoad)
+int TCViewLoadNext(HWND ParentWin, HWND ListWin, std::filesystem::path FileToLoad)
 {
   Audio::Sound *sound;
   sound = WindowGetSound(ListWin);
@@ -252,27 +252,27 @@ int TCViewLoadNext(HWND ParentWin, HWND ListWin, std::experimental::filesystem::
 
 void __stdcall ListSetDefaultParams(ListDefaultParamStruct *dps)
 {
-  std::experimental::filesystem::v1::path ini{dps->DefaultIniName};
+  std::filesystem::path ini{dps->DefaultIniName};
   ini.replace_filename("tcview.ini");
   Configuration::instance()->set_file(ini);
 }
 
 HWND __stdcall ListLoadW(HWND ParentWin,wchar_t* FileToLoad,int ShowFlags)
 {
-  return TCViewLoad(ParentWin, std::experimental::filesystem::v1::path{FileToLoad});
+  return TCViewLoad(ParentWin, std::filesystem::path{FileToLoad});
 }
 
 HWND __stdcall ListLoad(HWND ParentWin,char* FileToLoad,int ShowFlags)
 {
-  return TCViewLoad(ParentWin, std::experimental::filesystem::v1::path{FileToLoad});
+  return TCViewLoad(ParentWin, std::filesystem::path{FileToLoad});
 }
 
 int __stdcall ListLoadNextW(HWND ParentWin, HWND ListWin, wchar_t *FileToLoad, int ShowFlags)
 {
-  return TCViewLoadNext(ParentWin, ListWin, std::experimental::filesystem::v1::path{FileToLoad});
+  return TCViewLoadNext(ParentWin, ListWin, std::filesystem::path{FileToLoad});
 }
 
 int __stdcall ListLoadNext(HWND ParentWin, HWND ListWin, char *FileToLoad, int ShowFlags)
 {
-  return TCViewLoadNext(ParentWin, ListWin, std::experimental::filesystem::v1::path{FileToLoad});
+  return TCViewLoadNext(ParentWin, ListWin, std::filesystem::path{FileToLoad});
 }

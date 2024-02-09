@@ -43,9 +43,9 @@ class Configuration
     Property<bool> looping{"playback", "looping", true};
     Property<float> volume{"playback", "volume", 1.0};
     static Configuration * instance();
-    void set_file(std::experimental::filesystem::v1::path filename);
+    void set_file(std::filesystem::path filename);
   private:
-    std::experimental::filesystem::v1::path filename;
+    std::filesystem::path filename;
     static Configuration *_instance;
     Configuration ();
     Configuration ( const Configuration& );

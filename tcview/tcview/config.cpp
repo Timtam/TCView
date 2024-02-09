@@ -40,7 +40,7 @@ Configuration::CGuard::~CGuard()
   }
 }
 
-void Configuration::set_file(std::experimental::filesystem::v1::path filename)
+void Configuration::set_file(std::filesystem::path filename)
 {
   std::string value;
   unsigned int i;
