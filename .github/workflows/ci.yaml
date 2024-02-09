@@ -63,7 +63,7 @@ jobs:
         shell: powershell
         run: |
           New-Item -Path dist\tcview\x86 -ItemType directory
-          Copy-Item tcview\tcview\Release\tcview.wlx -Destination dist\tcview\tcview.wlx
+          Copy-Item tcview\\Release\tcview.wlx -Destination dist\tcview\tcview.wlx
           Copy-Item bass24\bass.dll -Destination dist\tcview\x86\bass.dll
           Copy-Item bass_aac24\bass_aac.dll -Destination dist\tcview\x86\bass_aac.dll
           Copy-Item bass_ac324\bass_ac3.dll -Destination dist\tcview\x86\bass_ac3.dll
@@ -76,7 +76,7 @@ jobs:
           Copy-Item basswm24\basswma.dll -Destination dist\tcview\x86\basswma.dll
           Copy-Item basswv24\basswv.dll -Destination dist\tcview\x86\basswv.dll
           New-Item -Path dist\tcview\x64 -ItemType directory
-          Copy-Item tcview\tcview\x64\Release\tcview.wlx64 -Destination dist\tcview\tcview.wlx64
+          Copy-Item tcview\x64\Release\tcview.wlx64 -Destination dist\tcview\tcview.wlx64
           Copy-Item bass24\x64\bass.dll -Destination dist\tcview\x64\bass.dll
           Copy-Item bass_aac24\x64\bass_aac.dll -Destination dist\tcview\x64\bass_aac.dll
           Copy-Item bass_ac324\x64\bass_ac3.dll -Destination dist\tcview\x64\bass_ac3.dll
