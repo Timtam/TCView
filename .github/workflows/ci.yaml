@@ -49,7 +49,7 @@ jobs:
           msbuild-architecture: x86
       - 
         name: "Build x86"
-        run: msbuild tcview\tcview.sln /p:Configuration=Release
+        run: msbuild tcview\tcview.sln /p:Configuration=Release /p:Platform=x86
       -
         name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -57,4 +57,40 @@ jobs:
           msbuild-architecture: x64
       - 
         name: "Build x64"
-        run: msbuild tcview\tcview.sln /p:Configuration=Release
+        run: msbuild tcview\tcview.sln /p:Configuration=Release /p:Platform=x64
+      -
+        name: Build artifact
+        shell: powershell
+        run: |
+          New-Item -Path dist\tcview\x86 -ItemType directory
+          Copy-Item tcview\tcview\Release\tcview.wlx -Destination dist\tcview\tcview.wlx
+          Copy-Item bass24\bass.dll -Destination dist\tcview\x86\bass.dll
+          Copy-Item bass_aac24\bass_aac.dll -Destination dist\tcview\x86\bass_aac.dll
+          Copy-Item bass_ac324\bass_ac3.dll -Destination dist\tcview\x86\bass_ac3.dll
+          Copy-Item bass_ape24\bass_ape.dll -Destination dist\tcview\x86\bass_ape.dll
+          Copy-Item bass_mpc24\bass_mpc.dll -Destination dist\tcview\x86\bass_mpc.dll
+          Copy-Item bass_spx24\bass_spx.dll -Destination dist\tcview\x86\bass_spx.dll
+          Copy-Item bassalac24\bassalac.dll -Destination dist\tcview\x86\bassalac.dll
+          Copy-Item bassflac24\bassflac.dll -Destination dist\tcview\x86\bassflac.dll
+          Copy-Item bassopus24\bassopus.dll -Destination dist\tcview\x86\bassopus.dll
+          Copy-Item basswm24\basswma.dll -Destination dist\tcview\x86\basswma.dll
+          Copy-Item basswv24\basswv.dll -Destination dist\tcview\x86\basswv.dll
+          New-Item -Path dist\tcview\x64 -ItemType directory
+          Copy-Item tcview\tcview\x64\Release\tcview.wlx64 -Destination dist\tcview\tcview.wlx64
+          Copy-Item bass24\x64\bass.dll -Destination dist\tcview\x64\bass.dll
+          Copy-Item bass_aac24\x64\bass_aac.dll -Destination dist\tcview\x64\bass_aac.dll
+          Copy-Item bass_ac324\x64\bass_ac3.dll -Destination dist\tcview\x64\bass_ac3.dll
+          Copy-Item bass_ape24\x64\bass_ape.dll -Destination dist\tcview\x64\bass_ape.dll
+          Copy-Item bass_mpc24\x64\bass_mpc.dll -Destination dist\tcview\x64\bass_mpc.dll
+          Copy-Item bass_spx24\x64\bass_spx.dll -Destination dist\tcview\x64\bass_spx.dll
+          Copy-Item bassalac24\x64\bassalac.dll -Destination dist\tcview\x64\bassalac.dll
+          Copy-Item bassflac24\x64\bassflac.dll -Destination dist\tcview\x64\bassflac.dll
+          Copy-Item bassopus24\x64\bassopus.dll -Destination dist\tcview\x64\bassopus.dll
+          Copy-Item basswm24\x64\basswma.dll -Destination dist\tcview\x64\basswma.dll
+          Copy-Item basswv24\x64\basswv.dll -Destination dist\tcview\x64\basswv.dll
+      - 
+        name: "Upload artifacts"
+        uses: actions/upload-artifact@v4
+        with:
+          name: "TCView"
+          path: dist/tcview
