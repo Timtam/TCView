@@ -47,7 +47,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
       - 
         name: "Build x86"
-        run: msbuild tcview.sln /p:Configuration=Release
+        run: msbuild tcview\tcview.sln /p:Configuration=Release
       -
         name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2
@@ -55,4 +55,4 @@ jobs:
           msbuild-architecture: x64
       - 
         name: "Build x64"
-        run: msbuild tcview.sln /p:Configuration=Release
+        run: msbuild tcview\tcview.sln /p:Configuration=Release
