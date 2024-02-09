@@ -12,10 +12,10 @@ namespace Audio
     private:
       HSTREAM sound;
     public:
-      Sound(std::experimental::filesystem::v1::path filename);
+      Sound(std::filesystem::path filename);
       void fade_out();
-      std::experimental::filesystem::v1::path get_filename();
-      void load(std::experimental::filesystem::v1::path filename);
+      std::filesystem::path get_filename();
+      void load(std::filesystem::path filename);
       void pause();
       void play();
       void stop();

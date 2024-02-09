@@ -39,9 +39,9 @@ jobs:
           & 7z --% x bassopus24.zip -obassopus24 -r
           & 7z --% x basswm24.zip -obasswm24 -r
           & 7z --% x basswv24.zip -obasswv24 -r
-          Copy-Item "bass24\c\bass.h" -Destination tcview
-          Copy-Item "bass24\c\bass.lib" -Destination "tcview\bass_x86.lib"
-          Copy-Item "bass24\c\x64\bass.lib" -Destination "tcview\bass_x64.lib"
+          Copy-Item "bass24\c\bass.h" -Destination tcview\tcview
+          Copy-Item "bass24\c\bass.lib" -Destination "tcview\tcview\bass_x86.lib"
+          Copy-Item "bass24\c\x64\bass.lib" -Destination "tcview\tcview\bass_x64.lib"
       -
         name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v2

@@ -15,12 +15,12 @@ namespace Audio
       Extensions.push_back(i.substr(2));
   }
 
-  Sound::Sound(std::experimental::filesystem::v1::path filename)
+  Sound::Sound(std::filesystem::path filename)
   {
     this->load(filename);
   }
 
-  void Sound::load(std::experimental::filesystem::v1::path filename)
+  void Sound::load(std::filesystem::path filename)
   {
     this->sound = BASS_StreamCreateFile(false, filename.c_str(), 0, 0, BASS_STREAM_AUTOFREE | BASS_ASYNCFILE | BASS_UNICODE);
     if(this->sound == 0)
@@ -55,14 +55,14 @@ namespace Audio
       BASS_ChannelFlags(this->sound, 0, BASS_SAMPLE_LOOP);
   }
 
-  std::experimental::filesystem::v1::path Sound::get_filename()
+  std::filesystem::path Sound::get_filename()
   {
     BOOL success;
     BASS_CHANNELINFO info;
     success = BASS_ChannelGetInfo(this->sound, &info);
     if(!success)
       throw std::runtime_error("unable to retrieve filename");
-    return std::experimental::filesystem::v1::path{(wchar_t*)info.filename};
+    return std::filesystem::path{(wchar_t*)info.filename};
   }
 
   bool Sound::is_playing()
@@ -138,9 +138,9 @@ namespace Audio
     HPLUGIN hPlugin;
     HANDLE hFind = INVALID_HANDLE_VALUE;
     unsigned int i;
-    std::experimental::filesystem::v1::path currentdir{GetModuleDirectory()};
-    std::experimental::filesystem::v1::path fullpath;
-    std::experimental::filesystem::v1::path searchpattern;
+    std::filesystem::path currentdir{GetModuleDirectory()};
+    std::filesystem::path fullpath;
+    std::filesystem::path searchpattern;
     WIN32_FIND_DATAW ffd;
     #ifdef _WIN64
       currentdir.append("x64");
