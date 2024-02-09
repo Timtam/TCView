@@ -43,18 +43,16 @@ jobs:
           Copy-Item "bass24\c\bass.lib" -Destination "tcview\bass_x86.lib"
           Copy-Item "bass24\c\x64\bass.lib" -Destination "tcview\bass_x64.lib"
       -
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x86
-          vsversion: 2019
+        name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
       - 
         name: "Build x86"
         run: msbuild tcview.sln /p:Configuration=Release
       -
-        uses: ilammy/msvc-dev-cmd@v1
+        name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
         with:
-          arch: x64
-          vsversion: 2019
+          msbuild-architecture: x64
       - 
         name: "Build x64"
         run: msbuild tcview.sln /p:Configuration=Release
